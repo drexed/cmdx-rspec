@@ -1,8 +1,54 @@
+plugins:
+  - rubocop-performance
+  - rubocop-rake
+  - rubocop-rspec
 AllCops:
-  TargetRubyVersion: 3.2
-
+  NewCops: enable
+  DisplayCopNames: true
+  DisplayStyleGuide: true
+  TargetRubyVersion: 3.1
+Gemspec/DevelopmentDependencies:
+  EnforcedStyle: gemspec
+Layout/EmptyLinesAroundAttributeAccessor:
+  Enabled: true
+Layout/EmptyLinesAroundClassBody:
+  EnforcedStyle: empty_lines_except_namespace
+Layout/EmptyLinesAroundModuleBody:
+  EnforcedStyle: empty_lines_except_namespace
+Layout/FirstHashElementIndentation:
+  EnforcedStyle: consistent
+Layout/LineLength:
+  Enabled: false
+Metrics/AbcSize:
+  Enabled: false
+RSpec/ExampleLength:
+  Enabled: false
+RSpec/IndexedLet:
+  Enabled: false
+RSpec/MessageSpies:
+  EnforcedStyle: receive
+RSpec/MultipleExpectations:
+  Enabled: false
+RSpec/MultipleMemoizedHelpers:
+  Enabled: false
+RSpec/NestedGroups:
+  Enabled: false
+RSpec/SpecFilePathFormat:
+  CustomTransform:
+    CMDx: cmdx
+RSpec/SubjectStub:
+  Enabled: false
+RSpec/StubbedMock:
+  Enabled: false
+RSpec/VerifiedDoubleReference:
+  Enabled: false
+Style/Documentation:
+  Enabled: false
+Style/FrozenStringLiteralComment:
+  Enabled: true
+  EnforcedStyle: always_true
+  SafeAutoCorrect: true
+Style/ModuleFunction:
+  EnforcedStyle: extend_self
 Style/StringLiterals:
-  EnforcedStyle: double_quotes
-
-Style/StringLiteralsInInterpolation:
   EnforcedStyle: double_quotes

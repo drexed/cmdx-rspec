@@ -1,10 +1,10 @@
 # frozen_string_literal: true
 
-require_relative "rspec/version"
+require "cmdx"
+require "rspec"
+require "zeitwerk"
 
-module Cmdx
-  module Rspec
-    class Error < StandardError; end
-    # Your code goes here...
-  end
-end
+# Set up Zeitwerk loader for the CMDx gem
+loader = Zeitwerk::Loader.for_gem
+loader.inflector.inflect("cmdx" => "CMDx")
+loader.setup
