@@ -4,7 +4,8 @@ require "cmdx"
 require "rspec"
 require "zeitwerk"
 
-# Set up Zeitwerk loader for the CMDx gem
-loader = Zeitwerk::Loader.for_gem
-loader.inflector.inflect("cmdx" => "CMDx")
-loader.setup
+require_relative "rspec/have_been_failure"
+require_relative "rspec/have_been_skipped"
+require_relative "rspec/have_been_success"
+require_relative "rspec/have_empty_context"
+require_relative "rspec/have_matching_context"
