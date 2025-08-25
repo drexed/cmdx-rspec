@@ -4,7 +4,6 @@ PATH
     cmdx-rspec (0.1.0)
       cmdx (>= 1.5.0)
       rspec
-      zeitwerk
 
 GEM
   remote: https://rubygems.org/

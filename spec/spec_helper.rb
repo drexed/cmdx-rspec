@@ -8,6 +8,14 @@ require "rspec"
 
 require "cmdx/rspec"
 
+spec_path = Pathname.new(File.expand_path("../spec", File.dirname(__FILE__)))
+
+%w[helpers].each do |dir|
+  Dir.glob(spec_path.join("support/#{dir}/**/*.rb"))
+     .sort_by { |f| [f.split("/").size, f] }
+     .each { |f| load(f) }
+end
+
 RSpec.configure do |config|
   config.shared_context_metadata_behavior = :apply_to_host_groups
 
@@ -24,6 +32,9 @@ RSpec.configure do |config|
   config.expect_with :rspec do |c|
     c.syntax = :expect
   end
+
+  config.include CMDx::Testing::TaskBuilders
+  config.include CMDx::Testing::WorkflowBuilders
 
   config.before do
     CMDx.reset_configuration!
