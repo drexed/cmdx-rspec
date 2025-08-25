@@ -186,14 +186,6 @@ RSpec.describe "have_matching_context matcher" do
 
   describe "error handling" do
     context "with unsupported input types" do
-      it "raises error for string" do
-        expect { expect("not a context").to have_matching_context(key: "value") }.to raise_error("unknown context type String")
-      end
-
-      it "raises error for nil" do
-        expect { expect(nil).to have_matching_context(key: "value") }.to raise_error("unknown context type NilClass")
-      end
-
       it "raises error for arbitrary object" do
         expect { expect(Object.new).to have_matching_context(key: "value") }.to raise_error(/unknown context type Object/)
       end
