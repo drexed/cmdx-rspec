@@ -32,6 +32,8 @@ Or install it yourself as:
 
 ### have_been_success
 
+Asserts that a CMDx task result indicates successful execution.
+
 ```ruby
 it "returns success" do
   result = SomeTask.execute
@@ -41,6 +43,8 @@ end
 ```
 
 ### have_been_skipped
+
+Asserts that a CMDx task result indicates the task was skipped during execution.
 
 ```ruby
 it "returns skipped" do
@@ -52,6 +56,8 @@ end
 
 ### have_been_failure
 
+Asserts that a CMDx task result indicates execution failure.
+
 ```ruby
 it "returns failure" do
   result = SomeTask.execute
@@ -61,6 +67,8 @@ end
 ```
 
 ### have_empty_context
+
+Asserts that a CMDx task result has no context data.
 
 ```ruby
 it "returns empty context" do
@@ -72,6 +80,8 @@ end
 
 ### have_matching_context
 
+Asserts that a CMDx task result contains specific context data.
+
 ```ruby
 it "returns matching context" do
   result = SomeTask.execute
@@ -81,6 +91,8 @@ end
 ```
 
 ### be_deprecated
+
+Asserts that a CMDx task result indicates the task is deprecated.
 
 ```ruby
 it "returns deprecated" do
