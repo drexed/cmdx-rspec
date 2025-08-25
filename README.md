@@ -1,28 +1,94 @@
-# Cmdx::Rspec
+<p align="center">
+  <img src="./src/cmdx-rspec-logo.png" width="200" alt="CMDx::I18n Logo">
+</p>
 
-TODO: Delete this and the text below, and describe your gem
+<p align="center">
+  <img alt="Version" src="https://img.shields.io/gem/v/cmdx-rspec">
+  <img alt="Build" src="https://github.com/drexed/cmdx-rspec/actions/workflows/ci.yml/badge.svg">
+  <img alt="License" src="https://img.shields.io/github/license/drexed/cmdx-rspec">
+</p>
 
-Welcome to your new gem! In this directory, you'll find the files you need to be able to package up your Ruby library into a gem. Put your Ruby code in the file `lib/cmdx/rspec`. To experiment with that code, run `bin/console` for an interactive prompt.
+# CMDx::I18n
+
+Collection of RSpec matchers for [CMDx](https://github.com/drexed/cmdx).
 
 ## Installation
 
-TODO: Replace `UPDATE_WITH_YOUR_GEM_NAME_IMMEDIATELY_AFTER_RELEASE_TO_RUBYGEMS_ORG` with your gem name right after releasing it to RubyGems.org. Please do not do it earlier due to security reasons. Alternatively, replace this section with instructions to install your gem from git if you don't plan to release to RubyGems.org.
+Add this line to your application's Gemfile:
 
-Install the gem and add to the application's Gemfile by executing:
-
-```bash
-bundle add UPDATE_WITH_YOUR_GEM_NAME_IMMEDIATELY_AFTER_RELEASE_TO_RUBYGEMS_ORG
+```ruby
+gem 'cmdx-rspec'
 ```
 
-If bundler is not being used to manage dependencies, install the gem by executing:
+And then execute:
 
-```bash
-gem install UPDATE_WITH_YOUR_GEM_NAME_IMMEDIATELY_AFTER_RELEASE_TO_RUBYGEMS_ORG
-```
+    $ bundle
+
+Or install it yourself as:
+
+    $ gem install cmdx-rspec
 
 ## Usage
 
-TODO: Write usage instructions here
+### have_been_success
+
+```ruby
+it "returns success" do
+  result = SomeTask.execute
+
+  expect(result).to have_been_success
+end
+```
+
+### have_been_skipped
+
+```ruby
+it "returns skipped" do
+  result = SomeTask.execute
+
+  expect(result).to have_been_skipped
+end
+```
+
+### have_been_failure
+
+```ruby
+it "returns failure" do
+  result = SomeTask.execute
+
+  expect(result).to have_been_failure
+end
+```
+
+### have_empty_context
+
+```ruby
+it "returns empty context" do
+  result = SomeTask.execute
+
+  expect(result).to have_empty_context
+end
+```
+
+### have_matching_context
+
+```ruby
+it "returns matching context" do
+  result = SomeTask.execute
+
+  expect(result).to have_matching_context(stored_result: 123)
+end
+```
+
+### be_deprecated
+
+```ruby
+it "returns deprecated" do
+  result = SomeTask.execute
+
+  expect(result).to be_deprecated
+end
+```
 
 ## Development
 
@@ -32,7 +98,7 @@ To install this gem onto your local machine, run `bundle exec rake install`. To 
 
 ## Contributing
 
-Bug reports and pull requests are welcome on GitHub at https://github.com/[USERNAME]/cmdx-rspec. This project is intended to be a safe, welcoming space for collaboration, and contributors are expected to adhere to the [code of conduct](https://github.com/[USERNAME]/cmdx-rspec/blob/master/CODE_OF_CONDUCT.md).
+Bug reports and pull requests are welcome on GitHub at https://github.com/drexed/cmdx-rspec. This project is intended to be a safe, welcoming space for collaboration, and contributors are expected to adhere to the [code of conduct](https://github.com/drexed/cmdx-rspec/blob/master/CODE_OF_CONDUCT.md).
 
 ## License
 
@@ -40,4 +106,4 @@ The gem is available as open source under the terms of the [MIT License](https:/
 
 ## Code of Conduct
 
-Everyone interacting in the Cmdx::Rspec project's codebases, issue trackers, chat rooms and mailing lists is expected to follow the [code of conduct](https://github.com/[USERNAME]/cmdx-rspec/blob/master/CODE_OF_CONDUCT.md).
+Everyone interacting in the Cmdx::Rspec project's codebases, issue trackers, chat rooms and mailing lists is expected to follow the [code of conduct](https://github.com/drexed/cmdx-rspec/blob/master/CODE_OF_CONDUCT.md).
