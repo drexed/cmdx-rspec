@@ -8,7 +8,7 @@
   <img alt="License" src="https://img.shields.io/github/license/drexed/cmdx-rspec">
 </p>
 
-# CMDx::I18n
+# CMDx::RSpec
 
 Collection of RSpec matchers for [CMDx](https://github.com/drexed/cmdx).
 
