@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="./src/cmdx-rspec-logo.png" width="200" alt="CMDx::I18n Logo">
+  <img src="./src/cmdx-rspec-logo.png" width="200" alt="CMDx::RSpec Logo">
 </p>
 
 <p align="center">
@@ -63,6 +63,30 @@ it "returns failure" do
   result = SomeTask.execute
 
   expect(result).to have_been_failure
+end
+```
+
+### have_empty_metadata
+
+Asserts that a CMDx task result has no metadata.
+
+```ruby
+it "returns empty metadata" do
+  result = SomeTask.execute
+
+  expect(result).to have_empty_metadata
+end
+```
+
+### have_matching_metadata
+
+Asserts that a CMDx task result contains specific metadata.
+
+```ruby
+it "returns matching metadata" do
+  result = SomeTask.execute
+
+  expect(result).to have_matching_metadata(status_code: 500)
 end
 ```
 

@@ -10,7 +10,6 @@ RSpec::Matchers.define :have_been_failure do |**data|
       state: CMDx::Result::INTERRUPTED,
       status: CMDx::Result::FAILED,
       outcome: CMDx::Result::FAILED,
-      metadata: {},
       reason: CMDx::Locale.t("cmdx.faults.unspecified"),
       cause: be_a(CMDx::FailFault),
       **data

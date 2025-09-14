@@ -10,7 +10,6 @@ RSpec::Matchers.define :have_been_success do |**data|
       state: CMDx::Result::COMPLETE,
       status: CMDx::Result::SUCCESS,
       outcome: CMDx::Result::SUCCESS,
-      metadata: {},
       **data
     )
   end

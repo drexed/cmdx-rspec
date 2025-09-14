@@ -10,7 +10,6 @@ RSpec::Matchers.define :have_been_skipped do |**data|
       state: CMDx::Result::INTERRUPTED,
       status: CMDx::Result::SKIPPED,
       outcome: CMDx::Result::SKIPPED,
-      metadata: {},
       reason: CMDx::Locale.t("cmdx.faults.unspecified"),
       cause: be_a(CMDx::SkipFault),
       **data

@@ -12,7 +12,7 @@ Reference the guides outlined in https://guides.rubygems.org
 ## Project Context
 CMDx::RSpec is a collection of RSpec matchers for the CMDx framework.
 Reference the CMDx documentation in https://github.com/drexed/cmdx/blob/main/LLM.md
-Reference the CMDx::I18n documentation in https://github.com/drexed/cmdx-i18n/blob/main/README.md
+Reference the CMDx::RSpec documentation in https://github.com/drexed/cmdx-rspec/blob/main/README.md
 
 ## Technology Stack
 - Ruby 3.4+

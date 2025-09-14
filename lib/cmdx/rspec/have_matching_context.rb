@@ -12,6 +12,10 @@ RSpec::Matchers.define :have_matching_context do |**data|
       else raise "unknown context type #{context.class}"
       end
 
-    expect(ctx).to include(**data)
+    if data.empty?
+      expect(ctx).to have_empty_context
+    else
+      expect(ctx).to include(**data)
+    end
   end
 end
