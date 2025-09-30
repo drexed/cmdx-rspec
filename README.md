@@ -1,12 +1,17 @@
-<p align="center">
-  <img src="./src/cmdx-rspec-logo.png" width="200" alt="CMDx::RSpec Logo">
-</p>
+<div align="center">
+  <img src="./src/cmdx-light-logo.png#gh-light-mode-only" width="200" alt="CMDx Logo">
+  <img src="./src/cmdx-dark-logo.png#gh-dark-mode-only" width="200" alt="CMDx Logo">
 
-<p align="center">
+  ---
+
+  Collection of RSpec matchers for the CMDx framework.
+
+  [Changelog](./CHANGELOG.md) · [Report Bug](https://github.com/drexed/cmdx-rspec/issues) · [Request Feature](https://github.com/drexed/cmdx-rspec/issues)
+
   <img alt="Version" src="https://img.shields.io/gem/v/cmdx-rspec">
   <img alt="Build" src="https://github.com/drexed/cmdx-rspec/actions/workflows/ci.yml/badge.svg">
   <img alt="License" src="https://img.shields.io/github/license/drexed/cmdx-rspec">
-</p>
+</div>
 
 # CMDx::RSpec
 
