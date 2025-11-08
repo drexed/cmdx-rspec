@@ -8,6 +8,7 @@ module CMDx
       # Sets up a stub that allows a command to receive :execute and return a successful result.
       #
       # @param command [Class] The command class to stub execution on
+      # @param metadata [Hash] Optional metadata to pass to the result
       # @param context [Hash] Optional keyword arguments to pass to the command
       #
       # @return [CMDx::Result] The successful result object
@@ -23,10 +24,11 @@ module CMDx
       #
       #   result = MyCommand.execute
       #   expect(result).to have_been_success
-      def allow_success(command, **context)
+      def allow_success(command, metadata: {}, **context)
         task   = command.new(context)
         result = task.result
 
+        result.metadata.merge!(metadata)
         result.executing!
         result.executed!
 
@@ -38,6 +40,7 @@ module CMDx
       # Sets up a stub that allows a command to receive :execute! and return a successful result.
       #
       # @param command [Class] The command class to stub execution on
+      # @param metadata [Hash] Optional metadata to pass to the result
       # @param context [Hash] Optional keyword arguments to pass to the command
       #
       # @return [CMDx::Result] The successful result object
@@ -53,10 +56,11 @@ module CMDx
       #
       #   result = MyCommand.execute!
       #   expect(result).to have_been_success
-      def allow_success!(command, **context)
+      def allow_success!(command, metadata: {}, **context)
         task   = command.new(context)
         result = task.result
 
+        result.metadata.merge!(metadata)
         result.executing!
         result.executed!
 
@@ -69,6 +73,8 @@ module CMDx
       #
       # @param command [Class] The command class to stub execution on
       # @param reason [String, nil] Optional reason for skipping
+      # @param cause [CMDx::Fault, nil] Optional cause for skipping
+      # @param metadata [Hash] Optional metadata to pass to the result
       # @param context [Hash] Optional keyword arguments to pass to the command
       #
       # @return [CMDx::Result] The skipped result object
@@ -84,12 +90,13 @@ module CMDx
       #
       #   result = MyCommand.execute(foo: "bar")
       #   expect(result).to have_been_skipped(reason: "Skipped for testing")
-      def allow_skip(command, reason: nil, cause: nil, **context)
+      def allow_skip(command, reason: nil, cause: nil, metadata: {}, **context)
         task   = command.new(context)
         result = task.result
+        cause  ||= CMDx::SkipFault.new(result)
 
         result.executing!
-        result.skip!(reason, halt: false, cause: cause || CMDx::SkipFault.new(result))
+        result.skip!(reason, halt: false, cause:, **metadata)
 
         allow(command).to receive(:execute).and_return(result)
 
@@ -100,6 +107,8 @@ module CMDx
       #
       # @param command [Class] The command class to stub execution on
       # @param reason [String, nil] Optional reason for skipping
+      # @param cause [CMDx::Fault, nil] Optional cause for skipping
+      # @param metadata [Hash] Optional metadata to pass to the result
       # @param context [Hash] Optional keyword arguments to pass to the command
       #
       # @return [CMDx::Result] The skipped result object
@@ -115,12 +124,13 @@ module CMDx
       #
       #   result = MyCommand.execute!(foo: "bar")
       #   expect(result).to have_been_skipped(reason: "Skipped for testing")
-      def allow_skip!(command, reason: nil, cause: nil, **context)
+      def allow_skip!(command, reason: nil, cause: nil, metadata: {}, **context)
         task   = command.new(context)
         result = task.result
+        cause  ||= CMDx::SkipFault.new(result)
 
         result.executing!
-        result.skip!(reason, halt: false, cause: cause || CMDx::SkipFault.new(result))
+        result.skip!(reason, halt: false, cause:, **metadata)
 
         allow(command).to receive(:execute!).and_return(result)
 
@@ -131,6 +141,8 @@ module CMDx
       #
       # @param command [Class] The command class to stub execution on
       # @param reason [String, nil] Optional reason for failure
+      # @param cause [CMDx::Fault, nil] Optional cause for failure
+      # @param metadata [Hash] Optional metadata to pass to the result
       # @param context [Hash] Optional keyword arguments to pass to the command
       #
       # @return [CMDx::Result] The failed result object
@@ -146,12 +158,13 @@ module CMDx
       #
       #   result = MyCommand.execute(foo: "bar")
       #   expect(result).to have_been_failure(reason: "Failed for testing")
-      def allow_failure(command, reason: nil, cause: nil, **context)
+      def allow_failure(command, reason: nil, cause: nil, metadata: {}, **context)
         task   = command.new(context)
         result = task.result
+        cause  ||= CMDx::FailFault.new(result)
 
         result.executing!
-        result.fail!(reason, halt: false, cause: cause || CMDx::FailFault.new(result))
+        result.fail!(reason, halt: false, cause:, **metadata)
 
         allow(command).to receive(:execute).and_return(result)
 
@@ -162,6 +175,8 @@ module CMDx
       #
       # @param command [Class] The command class to stub execution on
       # @param reason [String, nil] Optional reason for failure
+      # @param cause [CMDx::Fault, nil] Optional cause for failure
+      # @param metadata [Hash] Optional metadata to pass to the result
       # @param context [Hash] Optional keyword arguments to pass to the command
       #
       # @return [CMDx::Result] The failed result object
@@ -177,12 +192,13 @@ module CMDx
       #
       #   result = MyCommand.execute!(foo: "bar")
       #   expect(result).to have_been_failure(reason: "Failed for testing")
-      def allow_failure!(command, reason: nil, cause: nil, **context)
+      def allow_failure!(command, reason: nil, cause: nil, metadata: {}, **context)
         task   = command.new(context)
         result = task.result
+        cause  ||= CMDx::FailFault.new(result)
 
         result.executing!
-        result.fail!(reason, halt: false, cause: cause || CMDx::FailFault.new(result))
+        result.fail!(reason, halt: false, cause:, **metadata)
 
         allow(command).to receive(:execute!).and_return(result)
 
