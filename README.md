@@ -218,10 +218,10 @@ Helper methods for setting expectations on CMDx command execution.
 ```ruby
 it "mocks task executions by type" do
   # eg: MyCommand.execute
-  expect_execute(MyCommand)
+  expect_task_execution(MyCommand)
 
   # eg: MyCommand.execute!
-  expect_execute!(BangCommand)
+  expect_task_execution!(BangCommand)
 
   # Your specs...
 end
@@ -232,10 +232,10 @@ end
 ```ruby
 it "mocks task with arguments" do
   # eg: MyCommand.execute(some: "value")
-  expect_execute(MyCommand, some: "value")
+  expect_task_execution(MyCommand, some: "value")
 
   # eg: MyCommand.execute!(some: "value")
-  expect_execute!(MyCommand, some: "value")
+  expect_task_execution!(MyCommand, some: "value")
 
   # Your specs...
 end

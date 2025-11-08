@@ -213,15 +213,15 @@ module CMDx
       # @return [RSpec::Mocks::MessageExpectation] The RSpec expectation object
       #
       # @example Expecting execution with context
-      #   expect_execute(MyCommand, user_id: 123, role: "admin")
+      #   expect_task_execution(MyCommand, user_id: 123, role: "admin")
       #
       #   MyCommand.execute(user_id: 123, role: "admin")
       #
       # @example Expecting execution without context
-      #   expect_execute(MyCommand)
+      #   expect_task_execution(MyCommand)
       #
       #   MyCommand.execute
-      def expect_execute(command, **context)
+      def expect_task_execution(command, **context)
         if context.empty?
           expect(command).to receive(:execute)
         else
@@ -237,15 +237,15 @@ module CMDx
       # @return [RSpec::Mocks::MessageExpectation] The RSpec expectation object
       #
       # @example Expecting execution with context
-      #   expect_execute!(MyCommand, user_id: 123, role: "admin")
+      #   expect_task_execution!(MyCommand, user_id: 123, role: "admin")
       #
       #   MyCommand.execute!(user_id: 123, role: "admin")
       #
       # @example Expecting execution without context
-      #   expect_execute!(MyCommand)
+      #   expect_task_execution!(MyCommand)
       #
       #   MyCommand.execute!
-      def expect_execute!(command, **context)
+      def expect_task_execution!(command, **context)
         if context.empty?
           expect(command).to receive(:execute!)
         else
