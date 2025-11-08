@@ -35,6 +35,7 @@ RSpec.configure do |config|
 
   config.include CMDx::Testing::TaskBuilders
   config.include CMDx::Testing::WorkflowBuilders
+  config.include CMDx::RSpec::Helpers::Mocks
   config.include CMDx::RSpec::Helpers::Stubs
 
   config.before do
