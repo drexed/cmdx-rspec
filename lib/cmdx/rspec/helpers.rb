@@ -84,12 +84,12 @@ module CMDx
       #
       #   result = MyCommand.execute(foo: "bar")
       #   expect(result).to have_been_skipped(reason: "Skipped for testing")
-      def allow_skip(command, reason: nil, **context)
+      def allow_skip(command, reason: nil, cause: nil, **context)
         task   = command.new(context)
         result = task.result
 
         result.executing!
-        result.skip!(reason, halt: false, cause: CMDx::SkipFault.new(result))
+        result.skip!(reason, halt: false, cause: cause || CMDx::SkipFault.new(result))
 
         allow(command).to receive(:execute).and_return(result)
 
@@ -115,12 +115,12 @@ module CMDx
       #
       #   result = MyCommand.execute!(foo: "bar")
       #   expect(result).to have_been_skipped(reason: "Skipped for testing")
-      def allow_skip!(command, reason: nil, **context)
+      def allow_skip!(command, reason: nil, cause: nil, **context)
         task   = command.new(context)
         result = task.result
 
         result.executing!
-        result.skip!(reason, halt: false, cause: CMDx::SkipFault.new(result))
+        result.skip!(reason, halt: false, cause: cause || CMDx::SkipFault.new(result))
 
         allow(command).to receive(:execute!).and_return(result)
 
@@ -146,12 +146,12 @@ module CMDx
       #
       #   result = MyCommand.execute(foo: "bar")
       #   expect(result).to have_been_failure(reason: "Failed for testing")
-      def allow_failure(command, reason: nil, **context)
+      def allow_failure(command, reason: nil, cause: nil, **context)
         task   = command.new(context)
         result = task.result
 
         result.executing!
-        result.fail!(reason, halt: false, cause: CMDx::FailFault.new(result))
+        result.fail!(reason, halt: false, cause: cause || CMDx::FailFault.new(result))
 
         allow(command).to receive(:execute).and_return(result)
 
@@ -177,12 +177,12 @@ module CMDx
       #
       #   result = MyCommand.execute!(foo: "bar")
       #   expect(result).to have_been_failure(reason: "Failed for testing")
-      def allow_failure!(command, reason: nil, **context)
+      def allow_failure!(command, reason: nil, cause: nil, **context)
         task   = command.new(context)
         result = task.result
 
         result.executing!
-        result.fail!(reason, halt: false, cause: CMDx::FailFault.new(result))
+        result.fail!(reason, halt: false, cause: cause || CMDx::FailFault.new(result))
 
         allow(command).to receive(:execute!).and_return(result)
 
