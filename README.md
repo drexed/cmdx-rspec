@@ -139,8 +139,7 @@ Include the helper modules in your RSpec configuration or example groups:
 
 ```ruby
 RSpec.configure do |config|
-  config.include CMDx::RSpec::Helpers::Stubs
-  config.include CMDx::RSpec::Helpers::Mocks
+  config.include CMDx::RSpec::Helpers
 end
 ```
 
@@ -148,8 +147,7 @@ Or include them in specific example groups:
 
 ```ruby
 describe MyFeature do
-  include CMDx::RSpec::Helpers::Stubs
-  include CMDx::RSpec::Helpers::Mocks
+  include CMDx::RSpec::Helpers
 
   # your specs
 end
@@ -159,47 +157,31 @@ end
 
 Helper methods for stubbing CMDx command execution.
 
-#### allow_success / allow_success!
-
-Stubs a command to return a successful result.
-
 ```ruby
-allow_success(MyCommand, user_id: 123)
-result = MyCommand.execute(user_id: 123)
-expect(result).to have_been_success
-```
+it "stubs task executions" do
+  # Success
+  allow_success(SoftCommand)
+  allow_success!(BangCommand, user_id: 123)
 
-#### allow_skip / allow_skip!
+  # Skipped
+  allow_skip(SoftCommand)
+  allow_skip!(BangCommand, reason: "Skipped for testing", user_id: 123)
 
-Stubs a command to return a skipped result.
-
-```ruby
-allow_skip(MyCommand, reason: "Skipped for testing")
-result = MyCommand.execute
-expect(result).to have_been_skipped(reason: "Skipped for testing")
-```
-
-#### allow_failure / allow_failure!
-
-Stubs a command to return a failed result.
-
-```ruby
-allow_failure(MyCommand, reason: "Failed for testing")
-result = MyCommand.execute
-expect(result).to have_been_failure(reason: "Failed for testing")
+  # Failed
+  allow_failure(SoftCommand)
+  allow_failure!(BangCommand, reason: "Failed for testing", user_id: 123)
+end
 ```
 
 ### Mocks
 
 Helper methods for setting expectations on CMDx command execution.
 
-#### expect_execute / expect_execute!
-
-Sets up an expectation that a command will receive :execute or :execute!.
-
 ```ruby
-expect_execute(MyCommand, user_id: 123)
-MyCommand.execute(user_id: 123)
+it "mocks task executions" do
+  expect_execute(SoftCommand)
+  expect_execute!(BangCommand, user_id: 123)
+end
 ```
 
 ## Development

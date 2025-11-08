@@ -33,10 +33,9 @@ RSpec.configure do |config|
     c.syntax = :expect
   end
 
+  config.include CMDx::RSpec::Helpers
   config.include CMDx::Testing::TaskBuilders
   config.include CMDx::Testing::WorkflowBuilders
-  config.include CMDx::RSpec::Helpers::Mocks
-  config.include CMDx::RSpec::Helpers::Stubs
 
   config.before do
     CMDx.reset_configuration!

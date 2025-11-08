@@ -2,7 +2,7 @@
 
 require "spec_helper"
 
-RSpec.describe CMDx::RSpec::Helpers::Stubs do
+RSpec.describe CMDx::RSpec::Helpers do
   let(:task_class) { create_task_class(name: "TestTask") }
 
   describe "#allow_success" do
@@ -161,6 +161,38 @@ RSpec.describe CMDx::RSpec::Helpers::Stubs do
         result = task_class.execute!
 
         expect(result).to have_been_failure
+      end
+    end
+  end
+
+  describe "#expect_execute" do
+    context "when command receives execute with matching context" do
+      it "passes" do
+        expect_execute(task_class, foo: "bar")
+
+        task_class.execute(foo: "bar")
+      end
+
+      it "passes with empty context" do
+        expect_execute(task_class)
+
+        task_class.execute
+      end
+    end
+  end
+
+  describe "#expect_execute!" do
+    context "when command receives execute! with matching context" do
+      it "passes" do
+        expect_execute!(task_class, foo: "bar")
+
+        task_class.execute!(foo: "bar")
+      end
+
+      it "passes with empty context" do
+        expect_execute!(task_class)
+
+        task_class.execute!
       end
     end
   end

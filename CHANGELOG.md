@@ -7,8 +7,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 ## [Unreleased]
 
 ### Added
-- Added `mocks` helpers
-- Added `stubs` helpers
+- Added mock and stub helpers
 
 ### Changed
 - Moved matchers to be within the `lib/rspec/matchers` directory
