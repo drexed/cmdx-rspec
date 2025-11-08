@@ -223,7 +223,7 @@ module CMDx
       #   MyCommand.execute
       def expect_execute(command, **context)
         if context.empty?
-          expect(command).to receive(:execute).with(no_args)
+          expect(command).to receive(:execute)
         else
           expect(command).to receive(:execute).with(**context)
         end
@@ -247,7 +247,7 @@ module CMDx
       #   MyCommand.execute!
       def expect_execute!(command, **context)
         if context.empty?
-          expect(command).to receive(:execute!).with(no_args)
+          expect(command).to receive(:execute!)
         else
           expect(command).to receive(:execute!).with(**context)
         end
