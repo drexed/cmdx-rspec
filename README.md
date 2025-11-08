@@ -149,7 +149,7 @@ Or include them in specific example groups:
 describe MyFeature do
   include CMDx::RSpec::Helpers
 
-  # your specs
+  # Your specs...
 end
 ```
 
@@ -157,19 +157,55 @@ end
 
 Helper methods for stubbing CMDx command execution.
 
+### Execution types
+
 ```ruby
-it "stubs task executions" do
-  # Success
-  allow_success(SoftCommand)
-  allow_success!(BangCommand, user_id: 123)
+it "stubs task executions by type" do
+  # eg: MyCommand.execute
+  allow_success(MyCommand)
+  allow_skip(MyCommand)
+  allow_failure(MyCommand)
 
-  # Skipped
-  allow_skip(SoftCommand)
-  allow_skip!(BangCommand, reason: "Skipped for testing", user_id: 123)
+  # eg: MyCommand.execute!
+  allow_success!(MyCommand)
+  allow_skip!(MyCommand)
+  allow_failure!(MyCommand)
 
-  # Failed
-  allow_failure(SoftCommand)
-  allow_failure!(BangCommand, reason: "Failed for testing", user_id: 123)
+  # Your specs...
+end
+```
+
+### Options
+
+```ruby
+it "stubs task with arguments" do
+  # eg: MyCommand.execute(some: "value")
+  allow_success(MyCommand, some: "value")
+
+  # eg: MyCommand.execute!(some: "value")
+  allow_skip!(MyCommand, some: "value")
+
+  # Your specs...
+end
+```
+
+```ruby
+it "stubs task with metadata" do
+  allow_success(MyCommand, metadata: { some: "value" })
+
+  # Your specs...
+end
+
+it "stubs task with a custom reason" do
+  allow_skip!(MyCommand, reason: "Skipping for a custom reason")
+
+  # Your specs...
+end
+
+it "stubs task with a custom cause" do
+  allow_failure!(MyCommand, cause: NoMethodError.new("just blow it up"))
+
+  # Your specs...
 end
 ```
 
@@ -177,10 +213,31 @@ end
 
 Helper methods for setting expectations on CMDx command execution.
 
+### Execution types
+
 ```ruby
-it "mocks task executions" do
-  expect_execute(SoftCommand)
-  expect_execute!(BangCommand, user_id: 123)
+it "mocks task executions by type" do
+  # eg: MyCommand.execute
+  expect_execute(MyCommand)
+
+  # eg: MyCommand.execute!
+  expect_execute!(BangCommand)
+
+  # Your specs...
+end
+```
+
+### Options
+
+```ruby
+it "mocks task with arguments" do
+  # eg: MyCommand.execute(some: "value")
+  expect_execute(MyCommand, some: "value")
+
+  # eg: MyCommand.execute!(some: "value")
+  expect_execute!(MyCommand, some: "value")
+
+  # Your specs...
 end
 ```
 
