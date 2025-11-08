@@ -12,7 +12,7 @@ RSpec.describe CMDx::RSpec::Helpers do
 
         result = task_class.execute(foo: "bar")
 
-        expect(result).to have_been_success
+        expect(result).to have_succeeded
       end
 
       it "returns successful result with empty context" do
@@ -20,7 +20,7 @@ RSpec.describe CMDx::RSpec::Helpers do
 
         result = task_class.execute
 
-        expect(result).to have_been_success
+        expect(result).to have_succeeded
       end
     end
   end
@@ -32,7 +32,7 @@ RSpec.describe CMDx::RSpec::Helpers do
 
         result = task_class.execute!(foo: "bar")
 
-        expect(result).to have_been_success
+        expect(result).to have_succeeded
       end
 
       it "returns successful result with empty context" do
@@ -40,7 +40,7 @@ RSpec.describe CMDx::RSpec::Helpers do
 
         result = task_class.execute!
 
-        expect(result).to have_been_success
+        expect(result).to have_succeeded
       end
     end
   end
@@ -52,7 +52,7 @@ RSpec.describe CMDx::RSpec::Helpers do
 
         result = task_class.execute(foo: "bar")
 
-        expect(result).to have_been_skipped
+        expect(result).to have_skipped
       end
 
       it "returns skipped result with reason" do
@@ -62,7 +62,7 @@ RSpec.describe CMDx::RSpec::Helpers do
 
         result = task_class.execute(foo: "bar")
 
-        expect(result).to have_been_skipped(reason:)
+        expect(result).to have_skipped(reason:)
       end
 
       it "returns skipped result with empty context" do
@@ -70,7 +70,7 @@ RSpec.describe CMDx::RSpec::Helpers do
 
         result = task_class.execute
 
-        expect(result).to have_been_skipped
+        expect(result).to have_skipped
       end
     end
   end
@@ -82,7 +82,7 @@ RSpec.describe CMDx::RSpec::Helpers do
 
         result = task_class.execute!(foo: "bar")
 
-        expect(result).to have_been_skipped
+        expect(result).to have_skipped
       end
 
       it "returns skipped result with reason" do
@@ -92,7 +92,7 @@ RSpec.describe CMDx::RSpec::Helpers do
 
         result = task_class.execute!(foo: "bar")
 
-        expect(result).to have_been_skipped(reason:)
+        expect(result).to have_skipped(reason:)
       end
 
       it "returns skipped result with empty context" do
@@ -100,7 +100,7 @@ RSpec.describe CMDx::RSpec::Helpers do
 
         result = task_class.execute!
 
-        expect(result).to have_been_skipped
+        expect(result).to have_skipped
       end
     end
   end
@@ -112,7 +112,7 @@ RSpec.describe CMDx::RSpec::Helpers do
 
         result = task_class.execute(foo: "bar")
 
-        expect(result).to have_been_failure
+        expect(result).to have_failed
       end
 
       it "returns failed result with reason" do
@@ -122,7 +122,7 @@ RSpec.describe CMDx::RSpec::Helpers do
 
         result = task_class.execute(foo: "bar")
 
-        expect(result).to have_been_failure(reason:)
+        expect(result).to have_failed(reason:)
       end
 
       it "returns failed result with empty context" do
@@ -130,7 +130,7 @@ RSpec.describe CMDx::RSpec::Helpers do
 
         result = task_class.execute
 
-        expect(result).to have_been_failure
+        expect(result).to have_failed
       end
     end
   end
@@ -142,7 +142,7 @@ RSpec.describe CMDx::RSpec::Helpers do
 
         result = task_class.execute!(foo: "bar")
 
-        expect(result).to have_been_failure
+        expect(result).to have_failed
       end
 
       it "returns failed result with reason" do
@@ -152,7 +152,7 @@ RSpec.describe CMDx::RSpec::Helpers do
 
         result = task_class.execute!(foo: "bar")
 
-        expect(result).to have_been_failure(reason:)
+        expect(result).to have_failed(reason:)
       end
 
       it "returns failed result with empty context" do
@@ -160,7 +160,7 @@ RSpec.describe CMDx::RSpec::Helpers do
 
         result = task_class.execute!
 
-        expect(result).to have_been_failure
+        expect(result).to have_failed
       end
     end
   end

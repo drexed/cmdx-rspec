@@ -17,13 +17,13 @@ module CMDx
       #   stub_task_success(MyCommand, user_id: 123, role: "admin")
       #
       #   result = MyCommand.execute(user_id: 123, role: "admin")
-      #   expect(result).to have_been_success
+      #   expect(result).to have_succeeded
       #
       # @example Stubbing successful execution without context
       #   stub_task_success(MyCommand)
       #
       #   result = MyCommand.execute
-      #   expect(result).to have_been_success
+      #   expect(result).to have_succeeded
       def stub_task_success(command, metadata: {}, **context)
         task   = command.new(context)
         result = task.result
@@ -49,13 +49,13 @@ module CMDx
       #   stub_task_success!(MyCommand, user_id: 123, role: "admin")
       #
       #   result = MyCommand.execute!(user_id: 123, role: "admin")
-      #   expect(result).to have_been_success
+      #   expect(result).to have_succeeded
       #
       # @example Stubbing successful execution without context
       #   stub_task_success!(MyCommand)
       #
       #   result = MyCommand.execute!
-      #   expect(result).to have_been_success
+      #   expect(result).to have_succeeded
       def stub_task_success!(command, metadata: {}, **context)
         task   = command.new(context)
         result = task.result
@@ -83,13 +83,13 @@ module CMDx
       #   stub_task_skip(MyCommand, foo: "bar")
       #
       #   result = MyCommand.execute(foo: "bar")
-      #   expect(result).to have_been_skipped
+      #   expect(result).to have_skipped
       #
       # @example Stubbing skipped execution with reason
       #   stub_task_skip(MyCommand, reason: "Skipped for testing", foo: "bar")
       #
       #   result = MyCommand.execute(foo: "bar")
-      #   expect(result).to have_been_skipped(reason: "Skipped for testing")
+      #   expect(result).to have_skipped(reason: "Skipped for testing")
       def stub_task_skip(command, reason: nil, cause: nil, metadata: {}, **context)
         task   = command.new(context)
         result = task.result
@@ -117,13 +117,13 @@ module CMDx
       #   stub_task_skip!(MyCommand, foo: "bar")
       #
       #   result = MyCommand.execute!(foo: "bar")
-      #   expect(result).to have_been_skipped
+      #   expect(result).to have_skipped
       #
       # @example Stubbing skipped execution with reason
       #   stub_task_skip!(MyCommand, reason: "Skipped for testing", foo: "bar")
       #
       #   result = MyCommand.execute!(foo: "bar")
-      #   expect(result).to have_been_skipped(reason: "Skipped for testing")
+      #   expect(result).to have_skipped(reason: "Skipped for testing")
       def stub_task_skip!(command, reason: nil, cause: nil, metadata: {}, **context)
         task   = command.new(context)
         result = task.result
@@ -151,13 +151,13 @@ module CMDx
       #   stub_task_fail(MyCommand, foo: "bar")
       #
       #   result = MyCommand.execute(foo: "bar")
-      #   expect(result).to have_been_failure
+      #   expect(result).to have_failed
       #
       # @example Stubbing failed execution with reason
       #   stub_task_fail(MyCommand, reason: "Failed for testing", foo: "bar")
       #
       #   result = MyCommand.execute(foo: "bar")
-      #   expect(result).to have_been_failure(reason: "Failed for testing")
+      #   expect(result).to have_failed(reason: "Failed for testing")
       def stub_task_fail(command, reason: nil, cause: nil, metadata: {}, **context)
         task   = command.new(context)
         result = task.result
@@ -185,13 +185,13 @@ module CMDx
       #   stub_task_fail!(MyCommand, foo: "bar")
       #
       #   result = MyCommand.execute!(foo: "bar")
-      #   expect(result).to have_been_failure
+      #   expect(result).to have_failed
       #
       # @example Stubbing failed execution with reason
       #   stub_task_fail!(MyCommand, reason: "Failed for testing", foo: "bar")
       #
       #   result = MyCommand.execute!(foo: "bar")
-      #   expect(result).to have_been_failure(reason: "Failed for testing")
+      #   expect(result).to have_failed(reason: "Failed for testing")
       def stub_task_fail!(command, reason: nil, cause: nil, metadata: {}, **context)
         task   = command.new(context)
         result = task.result

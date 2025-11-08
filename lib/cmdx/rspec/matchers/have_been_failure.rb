@@ -15,12 +15,12 @@
 #
 # @example Checking if a result is a failure
 #   result = MyCommand.execute
-#   expect(result).to have_been_failure
+#   expect(result).to have_failed
 #
 # @example Checking failure with specific reason
 #   result = MyCommand.execute
-#   expect(result).to have_been_failure(reason: "Custom error message")
-RSpec::Matchers.define :have_been_failure do |**data|
+#   expect(result).to have_failed(reason: "Custom error message")
+RSpec::Matchers.define :have_failed do |**data|
   description { "have been a failure" }
 
   match(notify_expectation_failures: true) do |result|

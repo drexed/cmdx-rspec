@@ -15,12 +15,12 @@
 #
 # @example Checking if a result is skipped
 #   result = MyCommand.execute
-#   expect(result).to have_been_skipped
+#   expect(result).to have_skipped
 #
 # @example Checking skipped with specific reason
 #   result = MyCommand.execute
-#   expect(result).to have_been_skipped(reason: "Skipped for testing")
-RSpec::Matchers.define :have_been_skipped do |**data|
+#   expect(result).to have_skipped(reason: "Skipped for testing")
+RSpec::Matchers.define :have_skipped do |**data|
   description { "have been skipped" }
 
   match(notify_expectation_failures: true) do |result|

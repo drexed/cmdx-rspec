@@ -35,7 +35,7 @@ Or install it yourself as:
 
 ## Matchers
 
-### have_been_success
+### have_succeeded
 
 Asserts that a CMDx task result indicates successful execution.
 
@@ -43,11 +43,11 @@ Asserts that a CMDx task result indicates successful execution.
 it "returns success" do
   result = SomeTask.execute
 
-  expect(result).to have_been_success
+  expect(result).to have_succeeded
 end
 ```
 
-### have_been_skipped
+### have_skipped
 
 Asserts that a CMDx task result indicates the task was skipped during execution.
 
@@ -56,14 +56,14 @@ it "returns skipped" do
   result = SomeTask.execute
 
   # Default result
-  expect(result).to have_been_skipped
+  expect(result).to have_skipped
 
   # Custom result
-  expect(result).to have_been_skipped(reason: "Skipping for a custom reason")
+  expect(result).to have_skipped(reason: "Skipping for a custom reason")
 end
 ```
 
-### have_been_failure
+### have_failed
 
 Asserts that a CMDx task result indicates execution failure.
 
@@ -72,10 +72,10 @@ it "returns failure" do
   result = SomeTask.execute
 
   # Default result
-  expect(result).to have_been_failure
+  expect(result).to have_failed
 
   # Custom result
-  expect(result).to have_been_failure(reason: "Failed for a custom reason")
+  expect(result).to have_failed(reason: "Failed for a custom reason")
 end
 ```
 
@@ -133,9 +133,7 @@ Asserts that a CMDx task result indicates the task is deprecated.
 
 ```ruby
 it "returns deprecated" do
-  result = SomeTask.execute
-
-  expect(result).to be_deprecated
+  expect(SomeTask).to be_deprecated
 end
 ```
 
@@ -169,15 +167,15 @@ Helper methods for stubbing CMDx command execution.
 
 ```ruby
 it "stubs task executions by type" do
-  # eg: MyCommand.execute
-  stub_task_success(MyCommand)
-  stub_task_skip(MyCommand)
-  stub_task_fail(MyCommand)
+  # eg: SomeTask.execute
+  stub_task_success(SomeTask)
+  stub_task_skip(SomeTask)
+  stub_task_fail(SomeTask)
 
-  # eg: MyCommand.execute!
-  stub_task_success!(MyCommand)
-  stub_task_skip!(MyCommand)
-  stub_task_fail!(MyCommand)
+  # eg: SomeTask.execute!
+  stub_task_success!(SomeTask)
+  stub_task_skip!(SomeTask)
+  stub_task_fail!(SomeTask)
 
   # Your specs...
 end
@@ -187,11 +185,11 @@ end
 
 ```ruby
 it "stubs task with arguments" do
-  # eg: MyCommand.execute(some: "value")
-  stub_task_success(MyCommand, some: "value")
+  # eg: SomeTask.execute(some: "value")
+  stub_task_success(SomeTask, some: "value")
 
-  # eg: MyCommand.execute!(some: "value")
-  stub_task_skip!(MyCommand, some: "value")
+  # eg: SomeTask.execute!(some: "value")
+  stub_task_skip!(SomeTask, some: "value")
 
   # Your specs...
 end
@@ -199,19 +197,19 @@ end
 
 ```ruby
 it "stubs task with metadata" do
-  stub_task_success(MyCommand, metadata: { some: "value" })
+  stub_task_success(SomeTask, metadata: { some: "value" })
 
   # Your specs...
 end
 
 it "stubs task with a custom reason" do
-  stub_task_skip!(MyCommand, reason: "Skipping for a custom reason")
+  stub_task_skip!(SomeTask, reason: "Skipping for a custom reason")
 
   # Your specs...
 end
 
 it "stubs task with a custom cause" do
-  stub_task_fail!(MyCommand, cause: NoMethodError.new("just blow it up"))
+  stub_task_fail!(SomeTask, cause: NoMethodError.new("just blow it up"))
 
   # Your specs...
 end
@@ -225,10 +223,10 @@ Helper methods for setting expectations on CMDx command execution.
 
 ```ruby
 it "mocks task executions by type" do
-  # eg: MyCommand.execute
-  expect_task_execution(MyCommand)
+  # eg: SomeTask.execute
+  expect_task_execution(SomeTask)
 
-  # eg: MyCommand.execute!
+  # eg: SomeTask.execute!
   expect_task_execution!(BangCommand)
 
   # Your specs...
@@ -239,11 +237,11 @@ end
 
 ```ruby
 it "mocks task with arguments" do
-  # eg: MyCommand.execute(some: "value")
-  expect_task_execution(MyCommand, some: "value")
+  # eg: SomeTask.execute(some: "value")
+  expect_task_execution(SomeTask, some: "value")
 
-  # eg: MyCommand.execute!(some: "value")
-  expect_task_execution!(MyCommand, some: "value")
+  # eg: SomeTask.execute!(some: "value")
+  expect_task_execution!(SomeTask, some: "value")
 
   # Your specs...
 end
