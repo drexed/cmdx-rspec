@@ -12,7 +12,7 @@ RSpec.describe CMDx::RSpec::Helpers do
 
         result = task_class.execute(foo: "bar")
 
-        expect(result).to have_succeeded
+        expect(result).to be_successful
       end
 
       it "returns successful result with empty context" do
@@ -20,7 +20,7 @@ RSpec.describe CMDx::RSpec::Helpers do
 
         result = task_class.execute
 
-        expect(result).to have_succeeded
+        expect(result).to be_successful
       end
     end
   end
@@ -32,7 +32,7 @@ RSpec.describe CMDx::RSpec::Helpers do
 
         result = task_class.execute!(foo: "bar")
 
-        expect(result).to have_succeeded
+        expect(result).to be_successful
       end
 
       it "returns successful result with empty context" do
@@ -40,7 +40,7 @@ RSpec.describe CMDx::RSpec::Helpers do
 
         result = task_class.execute!
 
-        expect(result).to have_succeeded
+        expect(result).to be_successful
       end
     end
   end

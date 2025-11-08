@@ -35,7 +35,7 @@ Or install it yourself as:
 
 ## Matchers
 
-### have_succeeded
+### be_successful
 
 Asserts that a CMDx task result indicates successful execution.
 
@@ -43,7 +43,7 @@ Asserts that a CMDx task result indicates successful execution.
 it "returns success" do
   result = SomeTask.execute
 
-  expect(result).to have_succeeded
+  expect(result).to be_successful
 end
 ```
 

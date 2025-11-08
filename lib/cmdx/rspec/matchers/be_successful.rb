@@ -13,12 +13,12 @@
 #
 # @example Checking if a result is successful
 #   result = MyCommand.execute
-#   expect(result).to have_succeeded
+#   expect(result).to be_successful
 #
 # @example Checking success with additional attributes
 #   result = MyCommand.execute
-#   expect(result).to have_succeeded(state: CMDx::Result::COMPLETE)
-RSpec::Matchers.define :have_succeeded do |**data|
+#   expect(result).to be_successful(state: CMDx::Result::COMPLETE)
+RSpec::Matchers.define :be_successful do |**data|
   description { "have been a success" }
 
   match(notify_expectation_failures: true) do |result|

@@ -2,14 +2,14 @@
 
 require "spec_helper"
 
-RSpec.describe "have_succeeded matcher" do
+RSpec.describe "be_successful matcher" do
   describe "basic success checking" do
     context "when result is a success" do
       it "passes" do
         task_class = create_successful_task(name: "TestTask")
         result = task_class.execute(CMDx::Context.new)
 
-        expect(result).to have_succeeded
+        expect(result).to be_successful
       end
     end
   end
@@ -20,15 +20,15 @@ RSpec.describe "have_succeeded matcher" do
       let(:result) { task_class.execute(CMDx::Context.new) }
 
       it "validates all required success attributes" do
-        expect(result).to have_succeeded
+        expect(result).to be_successful
       end
 
       it "validates state is COMPLETE" do
-        expect(result).to have_succeeded(state: CMDx::Result::COMPLETE)
+        expect(result).to be_successful(state: CMDx::Result::COMPLETE)
       end
 
       it "validates status is SUCCESS" do
-        expect(result).to have_succeeded(status: CMDx::Result::SUCCESS)
+        expect(result).to be_successful(status: CMDx::Result::SUCCESS)
       end
     end
   end
@@ -36,22 +36,22 @@ RSpec.describe "have_succeeded matcher" do
   describe "edge cases" do
     context "with non-CMDx::Result input" do
       it "raises ArgumentError for string" do
-        expect { expect("not a result").to have_succeeded }.to raise_error(ArgumentError, "must be a CMDx::Result")
+        expect { expect("not a result").to be_successful }.to raise_error(ArgumentError, "must be a CMDx::Result")
       end
 
       it "raises ArgumentError for nil" do
-        expect { expect(nil).to have_succeeded }.to raise_error(ArgumentError, "must be a CMDx::Result")
+        expect { expect(nil).to be_successful }.to raise_error(ArgumentError, "must be a CMDx::Result")
       end
 
       it "raises ArgumentError for arbitrary object" do
-        expect { expect(Object.new).to have_succeeded }.to raise_error(ArgumentError, "must be a CMDx::Result")
+        expect { expect(Object.new).to be_successful }.to raise_error(ArgumentError, "must be a CMDx::Result")
       end
     end
   end
 
   describe "matcher description" do
     it "provides clear description" do
-      expect(have_succeeded.description).to eq("have been a success")
+      expect(be_successful.description).to eq("have been a success")
     end
   end
 end

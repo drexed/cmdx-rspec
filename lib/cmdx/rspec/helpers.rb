@@ -17,13 +17,13 @@ module CMDx
       #   stub_task_success(MyCommand, user_id: 123, role: "admin")
       #
       #   result = MyCommand.execute(user_id: 123, role: "admin")
-      #   expect(result).to have_succeeded
+      #   expect(result).to be_successful
       #
       # @example Stubbing successful execution without context
       #   stub_task_success(MyCommand)
       #
       #   result = MyCommand.execute
-      #   expect(result).to have_succeeded
+      #   expect(result).to be_successful
       def stub_task_success(command, metadata: {}, **context)
         task   = command.new(context)
         result = task.result
@@ -49,13 +49,13 @@ module CMDx
       #   stub_task_success!(MyCommand, user_id: 123, role: "admin")
       #
       #   result = MyCommand.execute!(user_id: 123, role: "admin")
-      #   expect(result).to have_succeeded
+      #   expect(result).to be_successful
       #
       # @example Stubbing successful execution without context
       #   stub_task_success!(MyCommand)
       #
       #   result = MyCommand.execute!
-      #   expect(result).to have_succeeded
+      #   expect(result).to be_successful
       def stub_task_success!(command, metadata: {}, **context)
         task   = command.new(context)
         result = task.result

@@ -12,6 +12,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 - Added mock and stub helpers
 
 ### Changed
+- Renamed `have_been_success` to `be_successful`
+- Renamed `have_been_failure` to `have_failed`
+- Renamed `have_been_skipped` to `have_skipped`
 - Moved matchers to be within the `lib/rspec/matchers` directory
 
 ## [0.2.0] - 2025-09-13
