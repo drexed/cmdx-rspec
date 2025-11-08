@@ -3,6 +3,8 @@
 require "cmdx"
 require "rspec"
 
+require_relative "rspec/helpers/stubs"
+
 require_relative "rspec/matchers/be_deprecated"
 require_relative "rspec/matchers/have_been_failure"
 require_relative "rspec/matchers/have_been_skipped"
