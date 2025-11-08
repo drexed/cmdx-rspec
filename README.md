@@ -55,7 +55,11 @@ Asserts that a CMDx task result indicates the task was skipped during execution.
 it "returns skipped" do
   result = SomeTask.execute
 
+  # Default result
   expect(result).to have_been_skipped
+
+  # Custom result
+  expect(result).to have_been_skipped(reason: "Skipping for a custom reason")
 end
 ```
 
@@ -67,7 +71,11 @@ Asserts that a CMDx task result indicates execution failure.
 it "returns failure" do
   result = SomeTask.execute
 
+  # Default result
   expect(result).to have_been_failure
+
+  # Custom result
+  expect(result).to have_been_failure(reason: "Failed for a custom reason")
 end
 ```
 
