@@ -33,7 +33,7 @@ Or install it yourself as:
 
     $ gem install cmdx-rspec
 
-## Usage
+## Matchers
 
 ### have_been_success
 
@@ -129,6 +129,77 @@ it "returns deprecated" do
 
   expect(result).to be_deprecated
 end
+```
+
+## Helpers
+
+### Including Helper Modules
+
+Include the helper modules in your RSpec configuration or example groups:
+
+```ruby
+RSpec.configure do |config|
+  config.include CMDx::RSpec::Helpers::Stubs
+  config.include CMDx::RSpec::Helpers::Mocks
+end
+```
+
+Or include them in specific example groups:
+
+```ruby
+describe MyFeature do
+  include CMDx::RSpec::Helpers::Stubs
+  include CMDx::RSpec::Helpers::Mocks
+
+  # your specs
+end
+```
+
+### Stubs
+
+Helper methods for stubbing CMDx command execution.
+
+#### allow_success / allow_success!
+
+Stubs a command to return a successful result.
+
+```ruby
+allow_success(MyCommand, user_id: 123)
+result = MyCommand.execute(user_id: 123)
+expect(result).to have_been_success
+```
+
+#### allow_skip / allow_skip!
+
+Stubs a command to return a skipped result.
+
+```ruby
+allow_skip(MyCommand, reason: "Skipped for testing")
+result = MyCommand.execute
+expect(result).to have_been_skipped(reason: "Skipped for testing")
+```
+
+#### allow_failure / allow_failure!
+
+Stubs a command to return a failed result.
+
+```ruby
+allow_failure(MyCommand, reason: "Failed for testing")
+result = MyCommand.execute
+expect(result).to have_been_failure(reason: "Failed for testing")
+```
+
+### Mocks
+
+Helper methods for setting expectations on CMDx command execution.
+
+#### expect_execute / expect_execute!
+
+Sets up an expectation that a command will receive :execute or :execute!.
+
+```ruby
+expect_execute(MyCommand, user_id: 123)
+MyCommand.execute(user_id: 123)
 ```
 
 ## Development
