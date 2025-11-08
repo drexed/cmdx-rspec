@@ -1,5 +1,25 @@
 # frozen_string_literal: true
 
+# Matcher to verify that a result represents a failure.
+#
+# @param data [Hash] Optional hash of additional attributes to match
+#   @option data [Symbol] :state Expected state (defaults to CMDx::Result::INTERRUPTED)
+#   @option data [Symbol] :status Expected status (defaults to CMDx::Result::FAILED)
+#   @option data [Symbol] :outcome Expected outcome (defaults to CMDx::Result::FAILED)
+#   @option data [String] :reason Expected reason string
+#   @option data [CMDx::FailFault] :cause Expected cause fault
+#
+# @return [RSpec::Matchers::BuiltIn::BaseMatcher] The matcher instance
+#
+# @raise [ArgumentError] if the actual value is not a CMDx::Result
+#
+# @example Checking if a result is a failure
+#   result = MyCommand.execute
+#   expect(result).to have_been_failure
+#
+# @example Checking failure with specific reason
+#   result = MyCommand.execute
+#   expect(result).to have_been_failure(reason: "Custom error message")
 RSpec::Matchers.define :have_been_failure do |**data|
   description { "have been a failure" }
 

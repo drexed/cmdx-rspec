@@ -1,5 +1,33 @@
 # frozen_string_literal: true
 
+# Matcher to verify that a command is deprecated.
+#
+# @param expected_behavior [Symbol, String, true, false, nil] Optional behavior to check
+#   - `:warn` or `/warn/` - checks if deprecation includes warning
+#   - `:log` or `/log/` - checks if deprecation includes logging
+#   - `:raise` or `/raise/` or `true` - checks if deprecation raises or is truthy
+#   - `:none` or `false` or `nil` - checks if deprecation is false or nil
+#   - Any other value - checks for exact match
+#
+# @return [RSpec::Matchers::BuiltIn::BaseMatcher] The matcher instance
+#
+# @example Checking if a command is deprecated
+#   expect(MyCommand).to be_deprecated
+#
+# @example Checking deprecated with raise behavior
+#   expect(MyCommand).to be_deprecated(:raise)
+#   expect(MyCommand).to be_deprecated.with_raise
+#
+# @example Checking deprecated with warning behavior
+#   expect(MyCommand).to be_deprecated(:warn)
+#   expect(MyCommand).to be_deprecated.with_warning
+#
+# @example Checking deprecated with logging behavior
+#   expect(MyCommand).to be_deprecated(:log)
+#   expect(MyCommand).to be_deprecated.with_logging
+#
+# @example Using chainable matchers
+#   expect(MyCommand).to be_deprecated.with_behavior(:custom)
 RSpec::Matchers.define :be_deprecated do |expected_behavior = nil|
   description do
     if (behavior = @expected_behavior || expected_behavior)
