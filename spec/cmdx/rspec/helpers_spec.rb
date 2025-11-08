@@ -5,10 +5,10 @@ require "spec_helper"
 RSpec.describe CMDx::RSpec::Helpers do
   let(:task_class) { create_task_class(name: "TestTask") }
 
-  describe "#allow_success" do
+  describe "#stub_task_success" do
     context "when stubbing execute" do
       it "returns successful result" do
-        allow_success(task_class, foo: "bar")
+        stub_task_success(task_class, foo: "bar")
 
         result = task_class.execute(foo: "bar")
 
@@ -16,7 +16,7 @@ RSpec.describe CMDx::RSpec::Helpers do
       end
 
       it "returns successful result with empty context" do
-        allow_success(task_class)
+        stub_task_success(task_class)
 
         result = task_class.execute
 
@@ -25,10 +25,10 @@ RSpec.describe CMDx::RSpec::Helpers do
     end
   end
 
-  describe "#allow_success!" do
+  describe "#stub_task_success!" do
     context "when stubbing execute!" do
       it "returns successful result" do
-        allow_success!(task_class, foo: "bar")
+        stub_task_success!(task_class, foo: "bar")
 
         result = task_class.execute!(foo: "bar")
 
@@ -36,7 +36,7 @@ RSpec.describe CMDx::RSpec::Helpers do
       end
 
       it "returns successful result with empty context" do
-        allow_success!(task_class)
+        stub_task_success!(task_class)
 
         result = task_class.execute!
 
@@ -45,10 +45,10 @@ RSpec.describe CMDx::RSpec::Helpers do
     end
   end
 
-  describe "#allow_skip" do
+  describe "#stub_task_skip" do
     context "when stubbing execute with skip" do
       it "returns skipped result" do
-        allow_skip(task_class, foo: "bar")
+        stub_task_skip(task_class, foo: "bar")
 
         result = task_class.execute(foo: "bar")
 
@@ -58,7 +58,7 @@ RSpec.describe CMDx::RSpec::Helpers do
       it "returns skipped result with reason" do
         reason = "Skipped for testing"
 
-        allow_skip(task_class, reason:, foo: "bar")
+        stub_task_skip(task_class, reason:, foo: "bar")
 
         result = task_class.execute(foo: "bar")
 
@@ -66,7 +66,7 @@ RSpec.describe CMDx::RSpec::Helpers do
       end
 
       it "returns skipped result with empty context" do
-        allow_skip(task_class)
+        stub_task_skip(task_class)
 
         result = task_class.execute
 
@@ -75,10 +75,10 @@ RSpec.describe CMDx::RSpec::Helpers do
     end
   end
 
-  describe "#allow_skip!" do
+  describe "#stub_task_skip!" do
     context "when stubbing execute! with skip" do
       it "returns skipped result" do
-        allow_skip!(task_class, foo: "bar")
+        stub_task_skip!(task_class, foo: "bar")
 
         result = task_class.execute!(foo: "bar")
 
@@ -88,7 +88,7 @@ RSpec.describe CMDx::RSpec::Helpers do
       it "returns skipped result with reason" do
         reason = "Skipped for testing"
 
-        allow_skip!(task_class, reason:, foo: "bar")
+        stub_task_skip!(task_class, reason:, foo: "bar")
 
         result = task_class.execute!(foo: "bar")
 
@@ -96,7 +96,7 @@ RSpec.describe CMDx::RSpec::Helpers do
       end
 
       it "returns skipped result with empty context" do
-        allow_skip!(task_class)
+        stub_task_skip!(task_class)
 
         result = task_class.execute!
 
@@ -105,10 +105,10 @@ RSpec.describe CMDx::RSpec::Helpers do
     end
   end
 
-  describe "#allow_failure" do
+  describe "#stub_task_fail" do
     context "when stubbing execute with failure" do
       it "returns failed result" do
-        allow_failure(task_class, foo: "bar")
+        stub_task_fail(task_class, foo: "bar")
 
         result = task_class.execute(foo: "bar")
 
@@ -118,7 +118,7 @@ RSpec.describe CMDx::RSpec::Helpers do
       it "returns failed result with reason" do
         reason = "Failed for testing"
 
-        allow_failure(task_class, reason:, foo: "bar")
+        stub_task_fail(task_class, reason:, foo: "bar")
 
         result = task_class.execute(foo: "bar")
 
@@ -126,7 +126,7 @@ RSpec.describe CMDx::RSpec::Helpers do
       end
 
       it "returns failed result with empty context" do
-        allow_failure(task_class)
+        stub_task_fail(task_class)
 
         result = task_class.execute
 
@@ -135,10 +135,10 @@ RSpec.describe CMDx::RSpec::Helpers do
     end
   end
 
-  describe "#allow_failure!" do
+  describe "#stub_task_fail!" do
     context "when stubbing execute! with failure" do
       it "returns failed result" do
-        allow_failure!(task_class, foo: "bar")
+        stub_task_fail!(task_class, foo: "bar")
 
         result = task_class.execute!(foo: "bar")
 
@@ -148,7 +148,7 @@ RSpec.describe CMDx::RSpec::Helpers do
       it "returns failed result with reason" do
         reason = "Failed for testing"
 
-        allow_failure!(task_class, reason:, foo: "bar")
+        stub_task_fail!(task_class, reason:, foo: "bar")
 
         result = task_class.execute!(foo: "bar")
 
@@ -156,7 +156,7 @@ RSpec.describe CMDx::RSpec::Helpers do
       end
 
       it "returns failed result with empty context" do
-        allow_failure!(task_class)
+        stub_task_fail!(task_class)
 
         result = task_class.execute!
 

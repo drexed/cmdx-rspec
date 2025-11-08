@@ -162,14 +162,14 @@ Helper methods for stubbing CMDx command execution.
 ```ruby
 it "stubs task executions by type" do
   # eg: MyCommand.execute
-  allow_success(MyCommand)
-  allow_skip(MyCommand)
-  allow_failure(MyCommand)
+  stub_task_success(MyCommand)
+  stub_task_skip(MyCommand)
+  stub_task_fail(MyCommand)
 
   # eg: MyCommand.execute!
-  allow_success!(MyCommand)
-  allow_skip!(MyCommand)
-  allow_failure!(MyCommand)
+  stub_task_success!(MyCommand)
+  stub_task_skip!(MyCommand)
+  stub_task_fail!(MyCommand)
 
   # Your specs...
 end
@@ -180,10 +180,10 @@ end
 ```ruby
 it "stubs task with arguments" do
   # eg: MyCommand.execute(some: "value")
-  allow_success(MyCommand, some: "value")
+  stub_task_success(MyCommand, some: "value")
 
   # eg: MyCommand.execute!(some: "value")
-  allow_skip!(MyCommand, some: "value")
+  stub_task_skip!(MyCommand, some: "value")
 
   # Your specs...
 end
@@ -191,19 +191,19 @@ end
 
 ```ruby
 it "stubs task with metadata" do
-  allow_success(MyCommand, metadata: { some: "value" })
+  stub_task_success(MyCommand, metadata: { some: "value" })
 
   # Your specs...
 end
 
 it "stubs task with a custom reason" do
-  allow_skip!(MyCommand, reason: "Skipping for a custom reason")
+  stub_task_skip!(MyCommand, reason: "Skipping for a custom reason")
 
   # Your specs...
 end
 
 it "stubs task with a custom cause" do
-  allow_failure!(MyCommand, cause: NoMethodError.new("just blow it up"))
+  stub_task_fail!(MyCommand, cause: NoMethodError.new("just blow it up"))
 
   # Your specs...
 end

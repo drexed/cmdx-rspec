@@ -14,17 +14,17 @@ module CMDx
       # @return [CMDx::Result] The successful result object
       #
       # @example Stubbing successful execution with context
-      #   allow_success(MyCommand, user_id: 123, role: "admin")
+      #   stub_task_success(MyCommand, user_id: 123, role: "admin")
       #
       #   result = MyCommand.execute(user_id: 123, role: "admin")
       #   expect(result).to have_been_success
       #
       # @example Stubbing successful execution without context
-      #   allow_success(MyCommand)
+      #   stub_task_success(MyCommand)
       #
       #   result = MyCommand.execute
       #   expect(result).to have_been_success
-      def allow_success(command, metadata: {}, **context)
+      def stub_task_success(command, metadata: {}, **context)
         task   = command.new(context)
         result = task.result
 
@@ -46,17 +46,17 @@ module CMDx
       # @return [CMDx::Result] The successful result object
       #
       # @example Stubbing successful execution with context
-      #   allow_success!(MyCommand, user_id: 123, role: "admin")
+      #   stub_task_success!(MyCommand, user_id: 123, role: "admin")
       #
       #   result = MyCommand.execute!(user_id: 123, role: "admin")
       #   expect(result).to have_been_success
       #
       # @example Stubbing successful execution without context
-      #   allow_success!(MyCommand)
+      #   stub_task_success!(MyCommand)
       #
       #   result = MyCommand.execute!
       #   expect(result).to have_been_success
-      def allow_success!(command, metadata: {}, **context)
+      def stub_task_success!(command, metadata: {}, **context)
         task   = command.new(context)
         result = task.result
 
@@ -80,17 +80,17 @@ module CMDx
       # @return [CMDx::Result] The skipped result object
       #
       # @example Stubbing skipped execution with context
-      #   allow_skip(MyCommand, foo: "bar")
+      #   stub_task_skip(MyCommand, foo: "bar")
       #
       #   result = MyCommand.execute(foo: "bar")
       #   expect(result).to have_been_skipped
       #
       # @example Stubbing skipped execution with reason
-      #   allow_skip(MyCommand, reason: "Skipped for testing", foo: "bar")
+      #   stub_task_skip(MyCommand, reason: "Skipped for testing", foo: "bar")
       #
       #   result = MyCommand.execute(foo: "bar")
       #   expect(result).to have_been_skipped(reason: "Skipped for testing")
-      def allow_skip(command, reason: nil, cause: nil, metadata: {}, **context)
+      def stub_task_skip(command, reason: nil, cause: nil, metadata: {}, **context)
         task   = command.new(context)
         result = task.result
         cause  ||= CMDx::SkipFault.new(result)
@@ -114,17 +114,17 @@ module CMDx
       # @return [CMDx::Result] The skipped result object
       #
       # @example Stubbing skipped execution with context
-      #   allow_skip!(MyCommand, foo: "bar")
+      #   stub_task_skip!(MyCommand, foo: "bar")
       #
       #   result = MyCommand.execute!(foo: "bar")
       #   expect(result).to have_been_skipped
       #
       # @example Stubbing skipped execution with reason
-      #   allow_skip!(MyCommand, reason: "Skipped for testing", foo: "bar")
+      #   stub_task_skip!(MyCommand, reason: "Skipped for testing", foo: "bar")
       #
       #   result = MyCommand.execute!(foo: "bar")
       #   expect(result).to have_been_skipped(reason: "Skipped for testing")
-      def allow_skip!(command, reason: nil, cause: nil, metadata: {}, **context)
+      def stub_task_skip!(command, reason: nil, cause: nil, metadata: {}, **context)
         task   = command.new(context)
         result = task.result
         cause  ||= CMDx::SkipFault.new(result)
@@ -148,17 +148,17 @@ module CMDx
       # @return [CMDx::Result] The failed result object
       #
       # @example Stubbing failed execution with context
-      #   allow_failure(MyCommand, foo: "bar")
+      #   stub_task_fail(MyCommand, foo: "bar")
       #
       #   result = MyCommand.execute(foo: "bar")
       #   expect(result).to have_been_failure
       #
       # @example Stubbing failed execution with reason
-      #   allow_failure(MyCommand, reason: "Failed for testing", foo: "bar")
+      #   stub_task_fail(MyCommand, reason: "Failed for testing", foo: "bar")
       #
       #   result = MyCommand.execute(foo: "bar")
       #   expect(result).to have_been_failure(reason: "Failed for testing")
-      def allow_failure(command, reason: nil, cause: nil, metadata: {}, **context)
+      def stub_task_fail(command, reason: nil, cause: nil, metadata: {}, **context)
         task   = command.new(context)
         result = task.result
         cause  ||= CMDx::FailFault.new(result)
@@ -182,17 +182,17 @@ module CMDx
       # @return [CMDx::Result] The failed result object
       #
       # @example Stubbing failed execution with context
-      #   allow_failure!(MyCommand, foo: "bar")
+      #   stub_task_fail!(MyCommand, foo: "bar")
       #
       #   result = MyCommand.execute!(foo: "bar")
       #   expect(result).to have_been_failure
       #
       # @example Stubbing failed execution with reason
-      #   allow_failure!(MyCommand, reason: "Failed for testing", foo: "bar")
+      #   stub_task_fail!(MyCommand, reason: "Failed for testing", foo: "bar")
       #
       #   result = MyCommand.execute!(foo: "bar")
       #   expect(result).to have_been_failure(reason: "Failed for testing")
-      def allow_failure!(command, reason: nil, cause: nil, metadata: {}, **context)
+      def stub_task_fail!(command, reason: nil, cause: nil, metadata: {}, **context)
         task   = command.new(context)
         result = task.result
         cause  ||= CMDx::FailFault.new(result)
