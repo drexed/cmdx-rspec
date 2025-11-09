@@ -205,6 +205,34 @@ module CMDx
         result
       end
 
+      # Unstubs a command's :execute method.
+      #
+      # @param command [Class] The command class to unstub execution on
+      #
+      # @return [void]
+      #
+      # @example Unstubbing execute
+      #   unstub_task(MyCommand)
+      #
+      #   MyCommand.execute
+      def unstub_task(command)
+        allow(command).to receive(:execute).and_call_original
+      end
+
+      # Unstubs a command's :execute! method.
+      #
+      # @param command [Class] The command class to unstub execution on
+      #
+      # @return [void]
+      #
+      # @example Unstubbing execute!
+      #   unstub_task!(MyCommand)
+      #
+      #   MyCommand.execute!
+      def unstub_task!(command)
+        allow(command).to receive(:execute!).and_call_original
+      end
+
       # Sets up an expectation that a command will receive :execute with the given context.
       #
       # @param command [Class] The command class to expect execution on

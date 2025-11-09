@@ -59,7 +59,11 @@ it "returns skipped" do
   expect(result).to have_skipped
 
   # Custom result
-  expect(result).to have_skipped(reason: "Skipping for a custom reason")
+  expect(result).to have_skipped(
+    reason: "Skipping for a custom reason",
+    cause: be_a(CMDx::SkipFault)
+    # Other members of `result.to_h`...
+  )
 end
 ```
 
@@ -75,7 +79,11 @@ it "returns failure" do
   expect(result).to have_failed
 
   # Custom result
-  expect(result).to have_failed(reason: "Failed for a custom reason")
+  expect(result).to have_failed(
+    reason: "Failed for a custom reason",
+    cause: be_a(NoMethodError)
+    # Other members of `result.to_h`...
+  )
 end
 ```
 
@@ -163,7 +171,7 @@ end
 
 Helper methods for stubbing CMDx command execution.
 
-### Execution types
+#### Types
 
 ```ruby
 it "stubs task executions by type" do
@@ -179,11 +187,7 @@ it "stubs task executions by type" do
 
   # Your specs...
 end
-```
 
-### Options
-
-```ruby
 it "stubs task with arguments" do
   # eg: SomeTask.execute(some: "value")
   stub_task_success(SomeTask, some: "value")
@@ -194,6 +198,8 @@ it "stubs task with arguments" do
   # Your specs...
 end
 ```
+
+#### Options
 
 ```ruby
 it "stubs task with metadata" do
@@ -215,11 +221,25 @@ it "stubs task with a custom cause" do
 end
 ```
 
+#### Reset
+
+```ruby
+it "unstubs task executions by type" do
+  # eg: SomeTask.execute
+  unstub_task(SomeTask)
+
+  # eg: SomeTask.execute!
+  unstub_task!(SomeTask)
+
+  # Your specs...
+end
+```
+
 ### Mocks
 
 Helper methods for setting expectations on CMDx command execution.
 
-### Execution types
+#### Types
 
 ```ruby
 it "mocks task executions by type" do
@@ -231,11 +251,7 @@ it "mocks task executions by type" do
 
   # Your specs...
 end
-```
 
-### Options
-
-```ruby
 it "mocks task with arguments" do
   # eg: SomeTask.execute(some: "value")
   expect_task_execution(SomeTask, some: "value")

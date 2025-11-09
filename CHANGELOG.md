@@ -6,7 +6,12 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ## [Unreleased]
 
-## [1.0.0] - 2025-11-09
+## [1.1.0] - 2025-11-08
+
+### Added
+- Added unstub helpers
+
+## [1.0.0] - 2025-11-08
 
 ### Added
 - Added mock and stub helpers
