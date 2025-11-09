@@ -261,6 +261,16 @@ it "mocks task with arguments" do
 
   # Your specs...
 end
+
+it "mocks no task executions by type" do
+  # eg: SomeTask.execute
+  expect_no_task_execution(SomeTask)
+
+  # eg: SomeTask.execute!
+  expect_no_task_execution!(SomeTask)
+
+  # Your specs...
+end
 ```
 
 ## Development

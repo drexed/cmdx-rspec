@@ -281,6 +281,34 @@ module CMDx
         end
       end
 
+      # Sets up an expectation that a command will not receive :execute.
+      #
+      # @param command [Class] The command class to expect execution on
+      #
+      # @return [RSpec::Mocks::MessageExpectation] The RSpec expectation object
+      #
+      # @example Expecting no execution
+      #   expect_no_task_execution(MyCommand)
+      #
+      #   MyCommand.execute
+      def expect_no_task_execution(command)
+        expect(command).not_to receive(:execute)
+      end
+
+      # Sets up an expectation that a command will not receive :execute!.
+      #
+      # @param command [Class] The command class to expect execution on
+      #
+      # @return [RSpec::Mocks::MessageExpectation] The RSpec expectation object
+      #
+      # @example Expecting no execution!
+      #   expect_no_task_execution!(MyCommand)
+      #
+      #   MyCommand.execute!
+      def expect_no_task_execution!(command)
+        expect(command).not_to receive(:execute!)
+      end
+
     end
   end
 end

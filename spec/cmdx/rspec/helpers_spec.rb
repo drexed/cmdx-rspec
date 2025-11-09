@@ -264,4 +264,20 @@ RSpec.describe CMDx::RSpec::Helpers do
       end
     end
   end
+
+  describe "#expect_no_task_execution" do
+    context "when command does not receive execute" do
+      it "passes" do
+        expect_no_task_execution(task_class)
+      end
+    end
+  end
+
+  describe "#expect_no_task_execution!" do
+    context "when command does not receive execute!" do
+      it "passes" do
+        expect_no_task_execution!(task_class)
+      end
+    end
+  end
 end
