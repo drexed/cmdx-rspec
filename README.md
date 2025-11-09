@@ -233,6 +233,16 @@ it "unstubs task executions by type" do
 
   # Your specs...
 end
+
+it "unstubs task with arguments" do
+  # eg: SomeTask.execute(some: "value")
+  unstub_task(SomeTask, some: "value")
+
+  # eg: SomeTask.execute!(some: "value")
+  unstub_task!(SomeTask, some: "value")
+
+  # Your specs...
+end
 ```
 
 ### Mocks
@@ -245,9 +255,11 @@ Helper methods for setting expectations on CMDx command execution.
 it "mocks task executions by type" do
   # eg: SomeTask.execute
   expect_task_execution(SomeTask)
+  expect_no_task_execution(SomeTask)
 
   # eg: SomeTask.execute!
   expect_task_execution!(BangCommand)
+  expect_no_task_execution!(SomeTask)
 
   # Your specs...
 end
@@ -255,19 +267,11 @@ end
 it "mocks task with arguments" do
   # eg: SomeTask.execute(some: "value")
   expect_task_execution(SomeTask, some: "value")
+  expect_no_task_execution(SomeTask, some: "value")
 
   # eg: SomeTask.execute!(some: "value")
   expect_task_execution!(SomeTask, some: "value")
-
-  # Your specs...
-end
-
-it "mocks no task executions by type" do
-  # eg: SomeTask.execute
-  expect_no_task_execution(SomeTask)
-
-  # eg: SomeTask.execute!
-  expect_no_task_execution!(SomeTask)
+  expect_no_task_execution!(SomeTask, some: "value")
 
   # Your specs...
 end

@@ -208,29 +208,49 @@ module CMDx
       # Unstubs a command's :execute method.
       #
       # @param command [Class] The command class to unstub execution on
+      # @param context [Hash] Optional keyword arguments to match against
       #
       # @return [void]
       #
-      # @example Unstubbing execute
+      # @example Unstubbing execute with context
+      #   unstub_task(MyCommand, foo: "bar")
+      #
+      #   MyCommand.execute(foo: "bar")
+      #
+      # @example Unstubbing execute without context
       #   unstub_task(MyCommand)
       #
       #   MyCommand.execute
-      def unstub_task(command)
-        allow(command).to receive(:execute).and_call_original
+      def unstub_task(command, **context)
+        if context.empty?
+          allow(command).to receive(:execute).and_call_original
+        else
+          allow(command).to receive(:execute).with(**context).and_call_original
+        end
       end
 
       # Unstubs a command's :execute! method.
       #
       # @param command [Class] The command class to unstub execution on
+      # @param context [Hash] Optional keyword arguments to match against
       #
       # @return [void]
       #
       # @example Unstubbing execute!
+      #   unstub_task!(MyCommand, foo: "bar")
+      #
+      #   MyCommand.execute!(foo: "bar")
+      #
+      # @example Unstubbing execute! without context
       #   unstub_task!(MyCommand)
       #
       #   MyCommand.execute!
-      def unstub_task!(command)
-        allow(command).to receive(:execute!).and_call_original
+      def unstub_task!(command, **context)
+        if context.empty?
+          allow(command).to receive(:execute!).and_call_original
+        else
+          allow(command).to receive(:execute!).with(**context).and_call_original
+        end
       end
 
       # Sets up an expectation that a command will receive :execute with the given context.
@@ -284,29 +304,49 @@ module CMDx
       # Sets up an expectation that a command will not receive :execute.
       #
       # @param command [Class] The command class to expect execution on
+      # @param context [Hash] Optional keyword arguments to match against
       #
       # @return [RSpec::Mocks::MessageExpectation] The RSpec expectation object
       #
-      # @example Expecting no execution
+      # @example Expecting no execution with context
+      #   expect_no_task_execution(MyCommand, foo: "bar")
+      #
+      #   MyCommand.execute(foo: "bar")
+      #
+      # @example Expecting no execution with empty context
       #   expect_no_task_execution(MyCommand)
       #
       #   MyCommand.execute
-      def expect_no_task_execution(command)
-        expect(command).not_to receive(:execute)
+      def expect_no_task_execution(command, **context)
+        if context.empty?
+          expect(command).not_to receive(:execute)
+        else
+          expect(command).not_to receive(:execute).with(**context)
+        end
       end
 
       # Sets up an expectation that a command will not receive :execute!.
       #
       # @param command [Class] The command class to expect execution on
+      # @param context [Hash] Optional keyword arguments to match against
       #
       # @return [RSpec::Mocks::MessageExpectation] The RSpec expectation object
       #
-      # @example Expecting no execution!
+      # @example Expecting no execution! with context
+      #   expect_no_task_execution!(MyCommand, foo: "bar")
+      #
+      #   MyCommand.execute!(foo: "bar")
+      #
+      # @example Expecting no execution! with empty context
       #   expect_no_task_execution!(MyCommand)
       #
       #   MyCommand.execute!
-      def expect_no_task_execution!(command)
-        expect(command).not_to receive(:execute!)
+      def expect_no_task_execution!(command, **context)
+        if context.empty?
+          expect(command).not_to receive(:execute!)
+        else
+          expect(command).not_to receive(:execute!).with(**context)
+        end
       end
 
     end
