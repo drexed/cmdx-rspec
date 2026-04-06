@@ -54,6 +54,8 @@ RSpec/VerifiedDoubleReference:
   Enabled: false
 Style/Documentation:
   Enabled: false
+Style/EmptyClassDefinition:
+  Enabled: false
 Style/FrozenStringLiteralComment:
   Enabled: true
   EnforcedStyle: always_true

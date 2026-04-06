@@ -58,7 +58,7 @@ RSpec::Matchers.define :be_deprecated do |expected_behavior = nil|
     target = actual.is_a?(Class) ? actual : actual.class
 
     # Check if deprecate setting exists and is truthy
-    deprecate_setting = target.settings[:deprecate]
+    deprecate_setting = target.settings.deprecate
     return false unless deprecate_setting
 
     # If no specific behavior expected, just check if deprecated
