@@ -349,6 +349,36 @@ module CMDx
         end
       end
 
+      # Yields each unique pipeline task class so workflow specs can stub tasks in one place.
+      #
+      # @param command [Class] Class including {CMDx::Workflow}
+      # @yield [Class] Distinct task class per pipeline stage (first-seen order)
+      # @return [Array<Class>] Deduplicated task list ({#each} return value)
+      # @raise [ArgumentError] if no block is given
+      # @raise [ArgumentError] if +command+ does not include {CMDx::Workflow}
+      #
+      # @example
+      #   stub_workflow_tasks(MyWorkflow) do |t|
+      #     if t == TaskB
+      #       stub_task_success(t)
+      #     elsif t == TaskC
+      #       stub_task_skip(t)
+      #     else
+      #       stub_task_success(t)
+      #     end
+      #   end
+      #
+      #   MyWorkflow.execute
+      def stub_workflow_tasks(command, &)
+        if !block_given?
+          raise ArgumentError, "block required"
+        elsif !command.include?(Workflow)
+          raise ArgumentError, "#{command.inspect} must be a workflow"
+        end
+
+        command.pipeline.flat_map(&:tasks).uniq.each(&)
+      end
+
     end
   end
 end

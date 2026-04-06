@@ -221,6 +221,28 @@ it "stubs task with a custom cause" do
 end
 ```
 
+#### Workflows
+
+Yields each distinct task class from the workflow’s pipeline (first-seen order) so you can stub them in one place.
+
+```ruby
+it "stubs every pipeline task for a workflow" do
+  stub_workflow_tasks(MyWorkflow) do |t|
+    if t == TaskB
+      stub_task_success(t)
+    elsif t == TaskC
+      stub_task_skip(t)
+    else
+      stub_task_success(t)
+    end
+  end
+
+  MyWorkflow.execute
+
+  # Your specs...
+end
+```
+
 #### Reset
 
 ```ruby
