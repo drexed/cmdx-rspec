@@ -1,33 +1,12 @@
 # frozen_string_literal: true
 
-# Matcher to verify that a task class is deprecated.
+# Asserts a Task class (or instance) is marked deprecated via CMDx's
+# `deprecation` declaration. Optionally constrains the deprecation
+# behavior — pass it positionally, via `.with_behavior(:warn)`, or use
+# the convenience chains `.with_warning`, `.with_logging`, `.with_error`.
 #
-# @param expected_behavior [Symbol, Proc, #call, nil] Optional behavior to check
-#   - `:warn` - checks that deprecation is configured to warn
-#   - `:log` - checks that deprecation is configured to log
-#   - `:error` - checks that deprecation is configured to raise
-#   - `Symbol` / `Proc` / callable - checks for exact equality with the configured value
-#   - `nil` (default) - just checks that the task is deprecated
-#
-# @return [RSpec::Matchers::BuiltIn::BaseMatcher] The matcher instance
-#
-# @example Checking if a task is deprecated
-#   expect(MyCommand).to be_deprecated
-#
-# @example Checking deprecated with error behavior
-#   expect(MyCommand).to be_deprecated(:error)
-#   expect(MyCommand).to be_deprecated.with_error
-#
-# @example Checking deprecated with warning behavior
-#   expect(MyCommand).to be_deprecated(:warn)
-#   expect(MyCommand).to be_deprecated.with_warning
-#
-# @example Checking deprecated with logging behavior
-#   expect(MyCommand).to be_deprecated(:log)
-#   expect(MyCommand).to be_deprecated.with_logging
-#
-# @example Using a custom behavior
-#   expect(MyCommand).to be_deprecated.with_behavior(:notify_sentry)
+# @example
+#   expect(SomeTask).to be_deprecated.with_warning
 RSpec::Matchers.define :be_deprecated do |expected_behavior = nil|
   description do
     if (behavior = @expected_behavior || expected_behavior)

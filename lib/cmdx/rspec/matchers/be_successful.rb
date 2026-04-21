@@ -1,22 +1,12 @@
 # frozen_string_literal: true
 
-# Matcher to verify that a result represents a successful execution.
+# Asserts a {CMDx::Result} represents a successful execution
+# (`state: complete`, `status: success`). Additional keyword args are
+# merged into a `result.to_h` inclusion check, so any Result field can be
+# constrained inline (e.g. `be_successful(metadata: { id: 1 })`).
 #
-# @param data [Hash] Optional hash of additional attributes to match
-#   @option data [String] :state Expected state (defaults to CMDx::Signal::COMPLETE)
-#   @option data [String] :status Expected status (defaults to CMDx::Signal::SUCCESS)
-#
-# @return [RSpec::Matchers::BuiltIn::BaseMatcher] The matcher instance
-#
-# @raise [ArgumentError] if the actual value is not a CMDx::Result
-#
-# @example Checking if a result is successful
-#   result = MyCommand.execute
-#   expect(result).to be_successful
-#
-# @example Checking success with additional attributes
-#   result = MyCommand.execute
-#   expect(result).to be_successful(state: CMDx::Signal::COMPLETE)
+# @example
+#   expect(SomeTask.execute).to be_successful
 RSpec::Matchers.define :be_successful do |**data|
   description { "have been a success" }
 

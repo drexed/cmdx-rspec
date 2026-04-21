@@ -1,24 +1,11 @@
 # frozen_string_literal: true
 
-# Matcher to verify that a result represents a skipped execution.
+# Asserts a {CMDx::Result} was skipped (`state: interrupted`,
+# `status: skipped`). Extra keyword args constrain other `result.to_h`
+# fields such as `:reason`, `:cause`, or `:metadata`.
 #
-# @param data [Hash] Optional hash of additional attributes to match
-#   @option data [String] :state Expected state (defaults to CMDx::Signal::INTERRUPTED)
-#   @option data [String] :status Expected status (defaults to CMDx::Signal::SKIPPED)
-#   @option data [String] :reason Expected reason string
-#   @option data [Exception] :cause Expected underlying cause
-#
-# @return [RSpec::Matchers::BuiltIn::BaseMatcher] The matcher instance
-#
-# @raise [ArgumentError] if the actual value is not a CMDx::Result
-#
-# @example Checking if a result is skipped
-#   result = MyCommand.execute
-#   expect(result).to have_skipped
-#
-# @example Checking skipped with specific reason
-#   result = MyCommand.execute
-#   expect(result).to have_skipped(reason: "Skipped for testing")
+# @example
+#   expect(result).to have_skipped(reason: "out of stock")
 RSpec::Matchers.define :have_skipped do |**data|
   description { "have been skipped" }
 
