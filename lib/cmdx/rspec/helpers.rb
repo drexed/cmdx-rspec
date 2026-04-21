@@ -200,7 +200,7 @@ module CMDx
         captured  = nil
         telemetry = command.telemetry
         listener  = lambda do |event|
-          captured ||= event.payload[:result].chain if event.chain_root
+          captured ||= event.payload[:result].chain if event.root
         end
 
         telemetry.subscribe(:task_executed, listener)
