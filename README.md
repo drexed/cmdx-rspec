@@ -4,7 +4,7 @@
 
   ---
 
-  Collection of RSpec matchers for the CMDx framework.
+  Collection of RSpec matchers and helpers for the CMDx framework.
 
   [Changelog](./CHANGELOG.md) · [Report Bug](https://github.com/drexed/cmdx-rspec/issues) · [Request Feature](https://github.com/drexed/cmdx-rspec/issues)
 
@@ -15,7 +15,7 @@
 
 # CMDx::RSpec
 
-Collection of RSpec matchers for [CMDx](https://github.com/drexed/cmdx).
+RSpec matchers and helpers for asserting [CMDx](https://github.com/drexed/cmdx) task and workflow behavior — result state, errors, faults, callbacks, retries, chains, and more — without invoking real `work` blocks.
 
 ## Requirements
 
@@ -24,137 +24,258 @@ Collection of RSpec matchers for [CMDx](https://github.com/drexed/cmdx).
 
 ## Installation
 
-Add this line to your application's Gemfile:
-
-```ruby
-gem 'cmdx-rspec'
+```sh
+gem install cmdx-rspec
+# - or -
+bundle add cmdx-rspec --group test
 ```
 
-And then execute:
+Require the library in `spec_helper.rb` (or equivalent):
 
-    $ bundle
+```ruby
+require "cmdx/rspec"
+```
 
-Or install it yourself as:
-
-    $ gem install cmdx-rspec
+This loads every matcher under `RSpec::Matchers` and exposes the helpers under `CMDx::RSpec::Helpers`. See [Helpers](#helpers) for how to mix the helpers into your example groups.
 
 ## Matchers
 
-### be_successful
+All result-oriented matchers raise `ArgumentError` when given a subject that isn't a `CMDx::Result`. Class-oriented matchers accept either the Task class or an instance.
 
-Asserts that a CMDx task result indicates successful execution.
+### Result state & status
+
+#### `be_successful`
+
+Asserts a `CMDx::Result` completed with `state: complete` and `status: success`. Extra keyword args are forwarded to a `result.to_h` inclusion check, so any field can be constrained inline.
 
 ```ruby
-it "returns success" do
-  result = SomeTask.execute
-
-  expect(result).to be_successful
-end
+expect(SomeTask.execute).to be_successful
+expect(SomeTask.execute).to be_successful(metadata: { id: 1 })
 ```
 
-### have_skipped
+#### `have_skipped`
 
-Asserts that a CMDx task result indicates the task was skipped during execution.
+Asserts a result was skipped (`state: interrupted`, `status: skipped`). Extra keyword args constrain other `result.to_h` fields.
 
 ```ruby
-it "returns skipped" do
-  result = SomeTask.execute
-
-  # Default result
-  expect(result).to have_skipped
-
-  # Custom result
-  expect(result).to have_skipped(
-    reason: "Skipping for a custom reason",
-    cause: be_a(CMDx::SkipFault)
-    # Other members of `result.to_h`...
-  )
-end
+expect(result).to have_skipped
+expect(result).to have_skipped(
+  reason: "out of stock",
+  cause: be_a(CMDx::SkipFault)
+)
 ```
 
-### have_failed
+#### `have_failed`
 
-Asserts that a CMDx task result indicates execution failure.
+Asserts a result failed (`state: interrupted`, `status: failed`). Extra keyword args constrain other `result.to_h` fields.
 
 ```ruby
-it "returns failure" do
-  result = SomeTask.execute
-
-  # Default result
-  expect(result).to have_failed
-
-  # Custom result
-  expect(result).to have_failed(
-    reason: "Failed for a custom reason",
-    cause: be_a(NoMethodError)
-    # Other members of `result.to_h`...
-  )
-end
+expect(result).to have_failed
+expect(result).to have_failed(
+  reason: "boom",
+  cause: be_a(NoMethodError)
+)
 ```
 
-### have_empty_metadata
+#### `be_ok` / `be_ko`
 
-Asserts that a CMDx task result has no metadata.
+`be_ok` passes when the result is success or skipped (anything but failed). `be_ko` is its inverse.
 
 ```ruby
-it "returns empty metadata" do
-  result = SomeTask.execute
-
-  expect(result).to have_empty_metadata
-end
+expect(result).to be_ok
+expect(result).to be_ko
 ```
 
-### have_matching_metadata
+#### `be_complete` / `be_interrupted`
 
-Asserts that a CMDx task result contains specific metadata.
+State-only assertions. `be_complete` passes when `state == :complete`; `be_interrupted` when `state == :interrupted`.
 
 ```ruby
-it "returns matching metadata" do
-  result = SomeTask.execute
-
-  expect(result).to have_matching_metadata(status_code: 500)
-end
+expect(result).to be_complete
+expect(result).to be_interrupted
 ```
 
-### have_empty_context
+### Result data
 
-Asserts that a CMDx task result has no context data.
+#### `have_empty_metadata` / `have_matching_metadata`
+
+`have_empty_metadata` requires `metadata` to be empty. `have_matching_metadata` performs a partial-hash inclusion match (and delegates to `have_empty_metadata` when called with no args).
 
 ```ruby
-it "returns empty context" do
-  result = SomeTask.execute
-
-  expect(result).to have_empty_context
-end
+expect(result).to have_empty_metadata
+expect(result).to have_matching_metadata(status_code: 500)
 ```
 
-### have_matching_context
+#### `have_empty_context` / `have_matching_context`
 
-Asserts that a CMDx task result contains specific context data.
+Same pattern for the result's context. Both accept a `Hash`, `CMDx::Context`, or `CMDx::Result` (the result's `.context` is unwrapped automatically).
 
 ```ruby
-it "returns matching context" do
-  result = SomeTask.execute
-
-  expect(result).to have_matching_context(stored_result: 123)
-end
+expect(result).to have_empty_context
+expect(result).to have_matching_context(stored_id: 123)
 ```
 
-### be_deprecated
+### Errors
 
-Asserts that a CMDx task result indicates the task is deprecated.
+#### `have_no_errors`
+
+Passes when the subject's `errors` collection is empty. Accepts a `CMDx::Result`, `CMDx::Task` instance, or `CMDx::Errors`.
 
 ```ruby
-it "returns deprecated" do
-  expect(SomeTask).to be_deprecated
-end
+expect(result).to have_no_errors
+```
+
+#### `have_errors_on`
+
+Asserts at least one error is present under `key`. Optional positional `messages` further constrain the matcher — all must be present.
+
+```ruby
+expect(result).to have_errors_on(:email)
+expect(result).to have_errors_on(:email, "is required")
+expect(task).to   have_errors_on(:email, "is required", "is invalid")
+```
+
+### Execution metrics
+
+#### `have_been_retried`
+
+Passes when the result was retried at least once. Pass an integer to require an exact retry count.
+
+```ruby
+expect(result).to have_been_retried
+expect(result).to have_been_retried(3)
+```
+
+#### `have_been_rolled_back`
+
+Passes when a failing task ran its rollback hook.
+
+```ruby
+expect(result).to have_been_rolled_back
+```
+
+#### `have_duration`
+
+Asserts the result's duration (in milliseconds) falls within the supplied bounds. At least one of `:less_than` or `:greater_than` is required.
+
+```ruby
+expect(result).to have_duration(less_than: 100)
+expect(result).to have_duration(greater_than: 0.1, less_than: 50)
+```
+
+### Faults
+
+#### `raise_cmdx_fault`
+
+Block matcher that asserts a `CMDx::Fault` is raised. Optionally constrain by originating task class, reason, or underlying cause.
+
+```ruby
+expect { SomeTask.execute! }.to raise_cmdx_fault
+expect { SomeTask.execute! }.to raise_cmdx_fault(SomeTask)
+expect { SomeTask.execute! }
+  .to raise_cmdx_fault(SomeTask)
+  .with_reason(/invalid/)
+  .with_cause(MyError)
+```
+
+`with_reason` accepts a string (equality) or a Regexp; `with_cause` accepts a class (matches via `is_a?`) or a value (matched with `values_match?`).
+
+### Chains
+
+#### `have_chain_root`
+
+Passes when the chain's root task class matches (or is a subclass of) `task_class`. Accepts a `CMDx::Chain` or `CMDx::Result`.
+
+```ruby
+expect(result).to have_chain_root(MyWorkflow)
+```
+
+#### `have_chain_size`
+
+Passes when the chain's size matches `expected`. Accepts a `CMDx::Chain` or `CMDx::Result`.
+
+```ruby
+expect(result).to have_chain_size(3)
+```
+
+### Task class declarations
+
+These matchers introspect a Task class's configuration. They accept either the class or an instance.
+
+#### `be_deprecated`
+
+Asserts a Task class is marked deprecated. Optionally constrain the deprecation behavior via a positional value or a chained convenience method.
+
+```ruby
+expect(SomeTask).to be_deprecated
+expect(SomeTask).to be_deprecated.with_warning   # :warn
+expect(SomeTask).to be_deprecated.with_logging   # :log
+expect(SomeTask).to be_deprecated.with_error     # :error
+expect(SomeTask).to be_deprecated.with_behavior(:custom)
+```
+
+#### `have_input` / `have_output`
+
+Asserts the class declares the given input/output. Keyword args are matched (partial) against the parameter's serialized `to_h`.
+
+```ruby
+expect(SomeTask).to have_input(:user_id)
+expect(SomeTask).to have_input(:user_id, type: :integer, required: true)
+expect(SomeTask).to have_output(:total, required: true)
+```
+
+#### `have_callback`
+
+Asserts a callback is registered for `event`. Optional `callable` further constrains the match — by `==` for symbols/lambdas, or by `is_a?` when given a class.
+
+```ruby
+expect(SomeTask).to have_callback(:before_execution)
+expect(SomeTask).to have_callback(:before_execution, :authenticate!)
+expect(SomeTask).to have_callback(:on_failed, AlertOnFailure)
+```
+
+#### `have_middleware`
+
+Asserts the class registered `middleware`. Class arguments match by `is_a?` or `==`; other values match by `==`.
+
+```ruby
+expect(SomeTask).to have_middleware(LoggingMiddleware)
+```
+
+#### `have_retry_on`
+
+Asserts the class is configured to retry on `exception`. Keyword args check `CMDx::Retry` configuration values (`:limit`, `:delay`, `:max_delay`, `:jitter`).
+
+```ruby
+expect(SomeTask).to have_retry_on(Net::OpenTimeout)
+expect(SomeTask).to have_retry_on(Net::OpenTimeout, limit: 5, jitter: :exponential)
+```
+
+#### `have_tag`
+
+Asserts the subject carries `tag`. Accepts a Task class (reads `settings.tags`) or a `CMDx::Result` (reads `result.tags`).
+
+```ruby
+expect(SomeTask).to have_tag(:critical)
+expect(result).to   have_tag(:critical)
+```
+
+### Workflows
+
+#### `have_pipeline_tasks`
+
+Asserts a `CMDx::Workflow` class declares the given pipeline tasks. Order-sensitive by default; chain `.in_any_order` for set comparison.
+
+```ruby
+expect(MyWorkflow).to have_pipeline_tasks(StepA, StepB, StepC)
+expect(MyWorkflow).to have_pipeline_tasks(StepA, StepC, StepB).in_any_order
 ```
 
 ## Helpers
 
-### Including Helper Modules
+### Including helper modules
 
-Include the helper modules in your RSpec configuration or example groups:
+Mix into all example groups via RSpec config, or include in specific groups:
 
 ```ruby
 RSpec.configure do |config|
@@ -162,162 +283,137 @@ RSpec.configure do |config|
 end
 ```
 
-Or include them in specific example groups:
-
 ```ruby
 describe MyFeature do
   include CMDx::RSpec::Helpers
-
-  # Your specs...
+  # ...
 end
 ```
 
 ### Stubs
 
-Helper methods for stubbing CMDx command execution.
+Each stub builds a frozen `CMDx::Result` carrying the requested signal and wires it into a fresh `CMDx::Chain`, so callers see realistic execution shape without invoking the task's `work`. Any extra keyword args (besides the documented ones) are forwarded to `command.new` as context overrides.
 
-#### Types
+#### Result-type stubs
 
 ```ruby
-it "stubs task executions by type" do
-  # eg: SomeTask.execute
-  stub_task_success(SomeTask)
-  stub_task_skip(SomeTask)
-  stub_task_fail(SomeTask)
+# Non-bang variants stub `SomeTask.execute`
+stub_task_success(SomeTask)
+stub_task_skip(SomeTask)
+stub_task_fail(SomeTask)
 
-  # eg: SomeTask.execute!
-  stub_task_success!(SomeTask)
-  stub_task_skip!(SomeTask)
-  stub_task_fail!(SomeTask)
+# Bang variants stub `SomeTask.execute!`
+stub_task_success!(SomeTask)
+stub_task_skip!(SomeTask)
+stub_task_fail!(SomeTask)
 
-  # Your specs...
-end
-
-it "stubs task with arguments" do
-  # eg: SomeTask.execute(some: "value")
-  stub_task_success(SomeTask, some: "value")
-
-  # eg: SomeTask.execute!(some: "value")
-  stub_task_skip!(SomeTask, some: "value")
-
-  # Your specs...
-end
+# Stub a specific argument signature
+stub_task_success(SomeTask, some: "value")        # SomeTask.execute(some: "value")
+stub_task_skip!(SomeTask, some: "value")          # SomeTask.execute!(some: "value")
 ```
 
-#### Options
+Common options:
 
 ```ruby
-it "stubs task with metadata" do
-  stub_task_success(SomeTask, metadata: { some: "value" })
-
-  # Your specs...
-end
-
-it "stubs task with a custom reason" do
-  stub_task_skip!(SomeTask, reason: "Skipping for a custom reason")
-
-  # Your specs...
-end
-
-it "stubs task with a custom cause" do
-  stub_task_fail!(SomeTask, cause: NoMethodError.new("just blow it up"))
-
-  # Your specs...
-end
+stub_task_success(SomeTask, metadata: { id: 1 })
+stub_task_skip!(SomeTask, reason: "out of stock")
+stub_task_fail!(SomeTask, cause: NoMethodError.new("boom"))
 ```
 
-#### Workflows
-
-Yields each distinct task class from the workflow’s pipeline (first-seen order) so you can stub them in one place.
+#### Specialized stubs
 
 ```ruby
-it "stubs every pipeline task for a workflow" do
-  stub_workflow_tasks(MyWorkflow) do |t|
-    if t == TaskB
-      stub_task_success(t)
-    elsif t == TaskC
-      stub_task_skip(t)
-    else
-      stub_task_success(t)
-    end
+# Models the rescued StandardError -> failed signal path that Runtime
+# takes when `work` raises something other than a Fault.
+stub_task_error(SomeTask, Net::OpenTimeout, "boom")
+
+# Models the `throw!`-then-propagate path used by nested tasks/workflows.
+# `upstream_result` must be a failed CMDx::Result.
+stub_task_throw(SomeTask, upstream_result)
+
+# Returns a successful Result flagged as `deprecated?` without triggering
+# the real Deprecation action.
+stub_task_deprecated(SomeTask)
+```
+
+#### Workflow stubs
+
+`stub_workflow_tasks` yields each distinct Task class reachable from a Workflow's pipeline (first-seen order) so you can stub them in one place.
+
+```ruby
+stub_workflow_tasks(MyWorkflow) do |task|
+  case task
+  when TaskC then stub_task_skip(task)
+  else            stub_task_success(task)
   end
-
-  MyWorkflow.execute
-
-  # Your specs...
 end
+
+MyWorkflow.execute
 ```
 
-#### Reset
+#### Unstubbing
+
+Restores the original implementation. When `context` is supplied, only that argument signature is unstubbed.
 
 ```ruby
-it "unstubs task executions by type" do
-  # eg: SomeTask.execute
-  unstub_task(SomeTask)
-
-  # eg: SomeTask.execute!
-  unstub_task!(SomeTask)
-
-  # Your specs...
-end
-
-it "unstubs task with arguments" do
-  # eg: SomeTask.execute(some: "value")
-  unstub_task(SomeTask, some: "value")
-
-  # eg: SomeTask.execute!(some: "value")
-  unstub_task!(SomeTask, some: "value")
-
-  # Your specs...
-end
+unstub_task(SomeTask)                # SomeTask.execute
+unstub_task!(SomeTask)               # SomeTask.execute!
+unstub_task(SomeTask, some: "value") # SomeTask.execute(some: "value")
 ```
 
 ### Mocks
 
-Helper methods for setting expectations on CMDx command execution.
-
-#### Types
+Message expectations on `execute` / `execute!`. When `context` is supplied, the expectation is constrained to that signature.
 
 ```ruby
-it "mocks task executions by type" do
-  # eg: SomeTask.execute
-  expect_task_execution(SomeTask)
-  expect_no_task_execution(SomeTask)
+expect_task_execution(SomeTask)
+expect_task_execution!(SomeTask)
+expect_task_execution(SomeTask, some: "value")
 
-  # eg: SomeTask.execute!
-  expect_task_execution!(BangCommand)
-  expect_no_task_execution!(SomeTask)
+expect_no_task_execution(SomeTask)
+expect_no_task_execution!(SomeTask)
+expect_no_task_execution(SomeTask, some: "value")
+```
 
-  # Your specs...
-end
+### Diagnostics
 
-it "mocks task with arguments" do
-  # eg: SomeTask.execute(some: "value")
-  expect_task_execution(SomeTask, some: "value")
-  expect_no_task_execution(SomeTask, some: "value")
+#### `capture_cmdx_logs`
 
-  # eg: SomeTask.execute!(some: "value")
-  expect_task_execution!(SomeTask, some: "value")
-  expect_no_task_execution!(SomeTask, some: "value")
+Captures lines written to a temporary `CMDx.configuration.logger` for the duration of the block. The previous logger is restored on exit.
 
-  # Your specs...
-end
+```ruby
+logs = capture_cmdx_logs { MyCommand.execute }
+expect(logs.join).to include("status=success")
+```
+
+#### `subscribe_telemetry`
+
+Subscribes to telemetry events on a Task's telemetry registry for the duration of the block and returns every emitted event in order. Tasks subclassing `command` also fire (the registry is shared by reference until `dup`). Defaults to all events in `CMDx::Telemetry::EVENTS`.
+
+```ruby
+events = subscribe_telemetry(MyCommand, :task_executed) { MyCommand.execute }
+expect(events.map(&:name)).to eq([:task_executed])
+```
+
+#### `with_cmdx_chain`
+
+Captures the `CMDx::Chain` produced by the first root execution of `command` within the block. Returns `nil` if `command` didn't run as a root.
+
+```ruby
+chain = with_cmdx_chain(MyWorkflow) { MyWorkflow.execute }
+expect(chain.size).to be > 1
 ```
 
 ## Development
 
-After checking out the repo, run `bin/setup` to install dependencies. Then, run `rake spec` to run the tests. You can also run `bin/console` for an interactive prompt that will allow you to experiment.
+Run `bin/setup` to install dependencies, then `rake spec` to run the tests. Use `bin/console` for an interactive prompt.
 
-To install this gem onto your local machine, run `bundle exec rake install`. To release a new version, update the version number in `version.rb`, and then run `bundle exec rake release`, which will create a git tag for the version, push git commits and the created tag, and push the `.gem` file to [rubygems.org](https://rubygems.org).
+Release flow: bump `lib/cmdx/rspec/version.rb`, then `bundle exec rake release` to tag, push, and publish to [rubygems.org](https://rubygems.org).
 
 ## Contributing
 
-Bug reports and pull requests are welcome on GitHub at https://github.com/drexed/cmdx-rspec. This project is intended to be a safe, welcoming space for collaboration, and contributors are expected to adhere to the [code of conduct](https://github.com/drexed/cmdx-rspec/blob/master/CODE_OF_CONDUCT.md).
+Bug reports and pull requests are welcome at <https://github.com/drexed/cmdx-rspec>. Contributors are expected to follow the [code of conduct](https://github.com/drexed/cmdx-rspec/blob/master/CODE_OF_CONDUCT.md).
 
 ## License
 
-The gem is available as open source under the terms of the [MIT License](https://opensource.org/licenses/MIT).
-
-## Code of Conduct
-
-Everyone interacting in the Cmdx::Rspec project's codebases, issue trackers, chat rooms and mailing lists is expected to follow the [code of conduct](https://github.com/drexed/cmdx-rspec/blob/master/CODE_OF_CONDUCT.md).
+Released under the [MIT License](https://opensource.org/licenses/MIT).
