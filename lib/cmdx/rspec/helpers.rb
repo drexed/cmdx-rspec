@@ -80,6 +80,139 @@ module CMDx
         build_stub(command, :execute!, CMDx::Signal.failed(reason, metadata:, cause:), context, strict: true)
       end
 
+      # Stubs `command.execute` to return a frozen failed Result whose
+      # `cause` is an instance of +exception+. Models the "rescued
+      # StandardError -> failed signal" path that Runtime takes when a
+      # task's `work` raises something other than a Fault.
+      #
+      # @param command [Class] the Task class to stub
+      # @param exception [Class<StandardError>, StandardError] the cause
+      # @param message [String, nil] message used when constructing the
+      #   exception (when +exception+ is a Class) and to derive the reason
+      # @param metadata [Hash]
+      # @param context [Hash{Symbol => Object}]
+      # @return [CMDx::Result] the frozen Result installed on the stub
+      # @example
+      #   stub_task_error(MyCommand, Net::OpenTimeout, "boom")
+      def stub_task_error(command, exception, message = nil, metadata: {}, **context)
+        ex = exception.is_a?(Class) ? exception.new(message || "stubbed") : exception
+        reason = "[#{ex.class}] #{ex.message}"
+        build_stub(command, :execute, CMDx::Signal.failed(reason, metadata:, cause: ex), context)
+      end
+
+      # Stubs `command.execute` to return a frozen failed Result that
+      # echoes +upstream_result+. Models the `throw!`-then-propagate path
+      # used by nested tasks/workflows.
+      #
+      # @param command [Class] the Task class to stub
+      # @param upstream_result [CMDx::Result] the originating failure
+      # @param metadata [Hash]
+      # @param context [Hash{Symbol => Object}]
+      # @return [CMDx::Result] the frozen Result installed on the stub
+      def stub_task_throw(command, upstream_result, metadata: {}, **context)
+        unless upstream_result.is_a?(CMDx::Result) && upstream_result.failed?
+          raise ArgumentError,
+                "upstream_result must be a failed CMDx::Result"
+        end
+
+        build_stub(command, :execute, CMDx::Signal.echoed(upstream_result, metadata:), context)
+      end
+
+      # Stubs `command.execute` to return a successful Result flagged as
+      # `deprecated?`. Useful when asserting deprecation surfaces without
+      # triggering the real `Deprecation` action.
+      #
+      # @param command [Class] the Task class to stub
+      # @param metadata [Hash]
+      # @param context [Hash{Symbol => Object}]
+      # @return [CMDx::Result]
+      def stub_task_deprecated(command, metadata: {}, **context)
+        build_stub(command, :execute, CMDx::Signal.success(nil, metadata:), context, deprecated: true)
+      end
+
+      # Captures lines written to a temporary CMDx logger for the duration
+      # of the block. Restores the previous logger on exit.
+      #
+      # @yield runs the block with `CMDx.configuration.logger` swapped
+      # @return [Array<String>] captured log lines
+      # @example
+      #   logs = capture_cmdx_logs { MyCommand.execute }
+      #   expect(logs.join).to include("status=success")
+      def capture_cmdx_logs(&)
+        raise ArgumentError, "block required" unless block_given?
+
+        io = StringIO.new
+        previous = CMDx.configuration.logger
+        CMDx.configuration.logger = Logger.new(io, formatter: previous&.formatter || CMDx::LogFormatters::Line.new)
+        yield
+        io.string.lines.map(&:chomp)
+      ensure
+        CMDx.configuration.logger = previous if previous
+      end
+
+      # Subscribes to telemetry events on +command+'s telemetry registry
+      # for the duration of the block. Captures every emitted event.
+      # Tasks subclassing +command+ also fire (telemetry is cloned at
+      # class definition; the registry array is shared by reference until
+      # +dup+).
+      #
+      # @param command [Class] the Task class whose telemetry to listen on
+      # @param events [Array<Symbol>] event names to subscribe to;
+      #   defaults to all of {CMDx::Telemetry::EVENTS}
+      # @yield runs the block with subscribers attached
+      # @return [Array<CMDx::Telemetry::Event>] captured events in emission order
+      # @example
+      #   events = subscribe_telemetry(MyCommand, :task_executed) { MyCommand.execute }
+      #   expect(events.map(&:name)).to eq([:task_executed])
+      def subscribe_telemetry(command, *events, &)
+        raise ArgumentError, "block required" unless block_given?
+
+        events    = CMDx::Telemetry::EVENTS if events.empty?
+        captured  = []
+        telemetry = command.telemetry
+        listener  = ->(event) { captured << event }
+
+        events.each { |e| telemetry.subscribe(e, listener) }
+        begin
+          yield
+        ensure
+          events.each { |e| telemetry.unsubscribe(e, listener) }
+        end
+
+        captured
+      end
+
+      # Captures the {CMDx::Chain} produced by +command+'s execution
+      # within the block. Subscribes to +command+'s `:task_executed`
+      # telemetry to grab the chain reference before Runtime teardown
+      # clears it.
+      #
+      # @param command [Class] the Task class whose chain to capture
+      # @yield the block to execute
+      # @return [CMDx::Chain, nil] the chain (frozen by Runtime), or nil
+      #   when +command+ didn't run as a root during the block
+      # @example
+      #   chain = with_cmdx_chain(MyWorkflow) { MyWorkflow.execute }
+      #   expect(chain.size).to be > 1
+      def with_cmdx_chain(command)
+        raise ArgumentError, "block required" unless block_given?
+
+        captured  = nil
+        telemetry = command.telemetry
+        listener  = lambda do |event|
+          captured ||= event.payload[:result].chain if event.chain_root
+        end
+
+        telemetry.subscribe(:task_executed, listener)
+        begin
+          yield
+        ensure
+          telemetry.unsubscribe(:task_executed, listener)
+        end
+
+        captured
+      end
+
       # Restores `command.execute` to its original implementation.
       # When `context` is supplied, only the matching argument signature is unstubbed.
       #
