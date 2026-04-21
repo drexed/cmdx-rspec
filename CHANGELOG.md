@@ -6,6 +6,14 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ## [Unreleased]
 
+## [2.0.0] - Unreleased
+
+### Added
+- Support for CMDx v2
+
+### Changes
+- Updated helpers and matchers for new internals
+
 ## [1.4.0] - 2026-04-09
 
 ### Added

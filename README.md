@@ -17,6 +17,11 @@
 
 Collection of RSpec matchers for [CMDx](https://github.com/drexed/cmdx).
 
+## Requirements
+
+- Ruby: MRI 3.3+ or a compatible JRuby/TruffleRuby release
+- CMDx 2.0+
+
 ## Installation
 
 Add this line to your application's Gemfile:

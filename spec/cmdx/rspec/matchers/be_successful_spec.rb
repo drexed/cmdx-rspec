@@ -24,11 +24,11 @@ RSpec.describe "be_successful matcher" do
       end
 
       it "validates state is COMPLETE" do
-        expect(result).to be_successful(state: CMDx::Result::COMPLETE)
+        expect(result).to be_successful(state: CMDx::Signal::COMPLETE)
       end
 
       it "validates status is SUCCESS" do
-        expect(result).to be_successful(status: CMDx::Result::SUCCESS)
+        expect(result).to be_successful(status: CMDx::Signal::SUCCESS)
       end
     end
   end

@@ -3,9 +3,8 @@
 # Matcher to verify that a result represents a successful execution.
 #
 # @param data [Hash] Optional hash of additional attributes to match
-#   @option data [Symbol] :state Expected state (defaults to CMDx::Result::COMPLETE)
-#   @option data [Symbol] :status Expected status (defaults to CMDx::Result::SUCCESS)
-#   @option data [Symbol] :outcome Expected outcome (defaults to CMDx::Result::SUCCESS)
+#   @option data [String] :state Expected state (defaults to CMDx::Signal::COMPLETE)
+#   @option data [String] :status Expected status (defaults to CMDx::Signal::SUCCESS)
 #
 # @return [RSpec::Matchers::BuiltIn::BaseMatcher] The matcher instance
 #
@@ -17,7 +16,7 @@
 #
 # @example Checking success with additional attributes
 #   result = MyCommand.execute
-#   expect(result).to be_successful(state: CMDx::Result::COMPLETE)
+#   expect(result).to be_successful(state: CMDx::Signal::COMPLETE)
 RSpec::Matchers.define :be_successful do |**data|
   description { "have been a success" }
 
@@ -25,9 +24,8 @@ RSpec::Matchers.define :be_successful do |**data|
     raise ArgumentError, "must be a CMDx::Result" unless result.is_a?(CMDx::Result)
 
     expect(result.to_h).to include(
-      state: CMDx::Result::COMPLETE,
-      status: CMDx::Result::SUCCESS,
-      outcome: CMDx::Result::SUCCESS,
+      state: CMDx::Signal::COMPLETE,
+      status: CMDx::Signal::SUCCESS,
       **data
     )
   end

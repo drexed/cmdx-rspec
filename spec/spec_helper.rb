@@ -1,6 +1,5 @@
 # frozen_string_literal: true
 
-ENV["SKIP_CMDX_FREEZING"] = "1"
 ENV["TZ"] = "UTC"
 
 require "bundler/setup"
@@ -40,13 +39,5 @@ RSpec.configure do |config|
   config.before do
     CMDx.reset_configuration!
     CMDx.configuration.logger = Logger.new(nil)
-    CMDx::Chain.clear
-    CMDx::Middlewares::Correlate.clear
-  end
-
-  config.after do
-    CMDx.reset_configuration!
-    CMDx::Chain.clear
-    CMDx::Middlewares::Correlate.clear
   end
 end

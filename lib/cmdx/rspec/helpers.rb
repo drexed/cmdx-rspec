@@ -18,23 +18,8 @@ module CMDx
       #
       #   result = MyCommand.execute(user_id: 123, role: "admin")
       #   expect(result).to be_successful
-      #
-      # @example Stubbing successful execution without context
-      #   stub_task_success(MyCommand)
-      #
-      #   result = MyCommand.execute
-      #   expect(result).to be_successful
       def stub_task_success(command, metadata: {}, **context)
-        task   = command.new(context)
-        result = task.result
-
-        result.metadata.merge!(metadata)
-        result.executing!
-        result.executed!
-
-        allow(command).to receive(:execute).and_return(result)
-
-        result
+        build_stub(command, :execute, CMDx::Signal.success(nil, metadata:), context)
       end
 
       # Sets up a stub that allows a command to receive :execute! and return a successful result.
@@ -44,165 +29,60 @@ module CMDx
       # @param context [Hash] Optional keyword arguments to pass to the command
       #
       # @return [CMDx::Result] The successful result object
-      #
-      # @example Stubbing successful execution with context
-      #   stub_task_success!(MyCommand, user_id: 123, role: "admin")
-      #
-      #   result = MyCommand.execute!(user_id: 123, role: "admin")
-      #   expect(result).to be_successful
-      #
-      # @example Stubbing successful execution without context
-      #   stub_task_success!(MyCommand)
-      #
-      #   result = MyCommand.execute!
-      #   expect(result).to be_successful
       def stub_task_success!(command, metadata: {}, **context)
-        task   = command.new(context)
-        result = task.result
-
-        result.metadata.merge!(metadata)
-        result.executing!
-        result.executed!
-
-        allow(command).to receive(:execute!).and_return(result)
-
-        result
+        build_stub(command, :execute!, CMDx::Signal.success(nil, metadata:), context, strict: true)
       end
 
       # Sets up a stub that allows a command to receive :execute and return a skipped result.
       #
       # @param command [Class] The command class to stub execution on
       # @param reason [String, nil] Optional reason for skipping
-      # @param cause [CMDx::Fault, nil] Optional cause for skipping
+      # @param cause [Exception, nil] Optional underlying exception
       # @param metadata [Hash] Optional metadata to pass to the result
       # @param context [Hash] Optional keyword arguments to pass to the command
       #
       # @return [CMDx::Result] The skipped result object
-      #
-      # @example Stubbing skipped execution with context
-      #   stub_task_skip(MyCommand, foo: "bar")
-      #
-      #   result = MyCommand.execute(foo: "bar")
-      #   expect(result).to have_skipped
-      #
-      # @example Stubbing skipped execution with reason
-      #   stub_task_skip(MyCommand, reason: "Skipped for testing", foo: "bar")
-      #
-      #   result = MyCommand.execute(foo: "bar")
-      #   expect(result).to have_skipped(reason: "Skipped for testing")
       def stub_task_skip(command, reason: nil, cause: nil, metadata: {}, **context)
-        task   = command.new(context)
-        result = task.result
-        cause  ||= CMDx::SkipFault.new(result)
-
-        result.executing!
-        result.skip!(reason, halt: false, cause:, **metadata)
-
-        allow(command).to receive(:execute).and_return(result)
-
-        result
+        build_stub(command, :execute, CMDx::Signal.skipped(reason, metadata:, cause:), context)
       end
 
       # Sets up a stub that allows a command to receive :execute! and return a skipped result.
       #
       # @param command [Class] The command class to stub execution on
       # @param reason [String, nil] Optional reason for skipping
-      # @param cause [CMDx::Fault, nil] Optional cause for skipping
+      # @param cause [Exception, nil] Optional underlying exception
       # @param metadata [Hash] Optional metadata to pass to the result
       # @param context [Hash] Optional keyword arguments to pass to the command
       #
       # @return [CMDx::Result] The skipped result object
-      #
-      # @example Stubbing skipped execution with context
-      #   stub_task_skip!(MyCommand, foo: "bar")
-      #
-      #   result = MyCommand.execute!(foo: "bar")
-      #   expect(result).to have_skipped
-      #
-      # @example Stubbing skipped execution with reason
-      #   stub_task_skip!(MyCommand, reason: "Skipped for testing", foo: "bar")
-      #
-      #   result = MyCommand.execute!(foo: "bar")
-      #   expect(result).to have_skipped(reason: "Skipped for testing")
       def stub_task_skip!(command, reason: nil, cause: nil, metadata: {}, **context)
-        task   = command.new(context)
-        result = task.result
-        cause  ||= CMDx::SkipFault.new(result)
-
-        result.executing!
-        result.skip!(reason, halt: false, cause:, **metadata)
-
-        allow(command).to receive(:execute!).and_return(result)
-
-        result
+        build_stub(command, :execute!, CMDx::Signal.skipped(reason, metadata:, cause:), context, strict: true)
       end
 
       # Sets up a stub that allows a command to receive :execute and return a failed result.
       #
       # @param command [Class] The command class to stub execution on
       # @param reason [String, nil] Optional reason for failure
-      # @param cause [CMDx::Fault, nil] Optional cause for failure
+      # @param cause [Exception, nil] Optional underlying exception
       # @param metadata [Hash] Optional metadata to pass to the result
       # @param context [Hash] Optional keyword arguments to pass to the command
       #
       # @return [CMDx::Result] The failed result object
-      #
-      # @example Stubbing failed execution with context
-      #   stub_task_fail(MyCommand, foo: "bar")
-      #
-      #   result = MyCommand.execute(foo: "bar")
-      #   expect(result).to have_failed
-      #
-      # @example Stubbing failed execution with reason
-      #   stub_task_fail(MyCommand, reason: "Failed for testing", foo: "bar")
-      #
-      #   result = MyCommand.execute(foo: "bar")
-      #   expect(result).to have_failed(reason: "Failed for testing")
       def stub_task_fail(command, reason: nil, cause: nil, metadata: {}, **context)
-        task   = command.new(context)
-        result = task.result
-        cause  ||= CMDx::FailFault.new(result)
-
-        result.executing!
-        result.fail!(reason, halt: false, cause:, **metadata)
-
-        allow(command).to receive(:execute).and_return(result)
-
-        result
+        build_stub(command, :execute, CMDx::Signal.failed(reason, metadata:, cause:), context)
       end
 
       # Sets up a stub that allows a command to receive :execute! and return a failed result.
       #
       # @param command [Class] The command class to stub execution on
       # @param reason [String, nil] Optional reason for failure
-      # @param cause [CMDx::Fault, nil] Optional cause for failure
+      # @param cause [Exception, nil] Optional underlying exception
       # @param metadata [Hash] Optional metadata to pass to the result
       # @param context [Hash] Optional keyword arguments to pass to the command
       #
       # @return [CMDx::Result] The failed result object
-      #
-      # @example Stubbing failed execution with context
-      #   stub_task_fail!(MyCommand, foo: "bar")
-      #
-      #   result = MyCommand.execute!(foo: "bar")
-      #   expect(result).to have_failed
-      #
-      # @example Stubbing failed execution with reason
-      #   stub_task_fail!(MyCommand, reason: "Failed for testing", foo: "bar")
-      #
-      #   result = MyCommand.execute!(foo: "bar")
-      #   expect(result).to have_failed(reason: "Failed for testing")
       def stub_task_fail!(command, reason: nil, cause: nil, metadata: {}, **context)
-        task   = command.new(context)
-        result = task.result
-        cause  ||= CMDx::FailFault.new(result)
-
-        result.executing!
-        result.fail!(reason, halt: false, cause:, **metadata)
-
-        allow(command).to receive(:execute!).and_return(result)
-
-        result
+        build_stub(command, :execute!, CMDx::Signal.failed(reason, metadata:, cause:), context, strict: true)
       end
 
       # Unstubs a command's :execute method.
@@ -211,16 +91,6 @@ module CMDx
       # @param context [Hash] Optional keyword arguments to match against
       #
       # @return [void]
-      #
-      # @example Unstubbing execute with context
-      #   unstub_task(MyCommand, foo: "bar")
-      #
-      #   MyCommand.execute(foo: "bar")
-      #
-      # @example Unstubbing execute without context
-      #   unstub_task(MyCommand)
-      #
-      #   MyCommand.execute
       def unstub_task(command, **context)
         if context.empty?
           allow(command).to receive(:execute).and_call_original
@@ -235,16 +105,6 @@ module CMDx
       # @param context [Hash] Optional keyword arguments to match against
       #
       # @return [void]
-      #
-      # @example Unstubbing execute!
-      #   unstub_task!(MyCommand, foo: "bar")
-      #
-      #   MyCommand.execute!(foo: "bar")
-      #
-      # @example Unstubbing execute! without context
-      #   unstub_task!(MyCommand)
-      #
-      #   MyCommand.execute!
       def unstub_task!(command, **context)
         if context.empty?
           allow(command).to receive(:execute!).and_call_original
@@ -259,16 +119,6 @@ module CMDx
       # @param context [Hash] Optional keyword arguments to match against
       #
       # @return [RSpec::Mocks::MessageExpectation] The RSpec expectation object
-      #
-      # @example Expecting execution with context
-      #   expect_task_execution(MyCommand, user_id: 123, role: "admin")
-      #
-      #   MyCommand.execute(user_id: 123, role: "admin")
-      #
-      # @example Expecting execution without context
-      #   expect_task_execution(MyCommand)
-      #
-      #   MyCommand.execute
       def expect_task_execution(command, **context)
         if context.empty?
           expect(command).to receive(:execute)
@@ -283,16 +133,6 @@ module CMDx
       # @param context [Hash] Optional keyword arguments to match against
       #
       # @return [RSpec::Mocks::MessageExpectation] The RSpec expectation object
-      #
-      # @example Expecting execution with context
-      #   expect_task_execution!(MyCommand, user_id: 123, role: "admin")
-      #
-      #   MyCommand.execute!(user_id: 123, role: "admin")
-      #
-      # @example Expecting execution without context
-      #   expect_task_execution!(MyCommand)
-      #
-      #   MyCommand.execute!
       def expect_task_execution!(command, **context)
         if context.empty?
           expect(command).to receive(:execute!)
@@ -307,16 +147,6 @@ module CMDx
       # @param context [Hash] Optional keyword arguments to match against
       #
       # @return [RSpec::Mocks::MessageExpectation] The RSpec expectation object
-      #
-      # @example Expecting no execution with context
-      #   expect_no_task_execution(MyCommand, foo: "bar")
-      #
-      #   MyCommand.execute(foo: "bar")
-      #
-      # @example Expecting no execution with empty context
-      #   expect_no_task_execution(MyCommand)
-      #
-      #   MyCommand.execute
       def expect_no_task_execution(command, **context)
         if context.empty?
           expect(command).not_to receive(:execute)
@@ -331,16 +161,6 @@ module CMDx
       # @param context [Hash] Optional keyword arguments to match against
       #
       # @return [RSpec::Mocks::MessageExpectation] The RSpec expectation object
-      #
-      # @example Expecting no execution! with context
-      #   expect_no_task_execution!(MyCommand, foo: "bar")
-      #
-      #   MyCommand.execute!(foo: "bar")
-      #
-      # @example Expecting no execution! with empty context
-      #   expect_no_task_execution!(MyCommand)
-      #
-      #   MyCommand.execute!
       def expect_no_task_execution!(command, **context)
         if context.empty?
           expect(command).not_to receive(:execute!)
@@ -377,6 +197,30 @@ module CMDx
         end
 
         command.pipeline.flat_map(&:tasks).uniq.each(&)
+      end
+
+      private
+
+      # Fabricates a frozen-style {CMDx::Result} without invoking the
+      # Runtime, then stubs +method+ on +command+ to return it.
+      #
+      # @api private
+      def build_stub(command, method, signal, context, **)
+        task   = command.new(context)
+        chain  = CMDx::Chain.new
+        result = CMDx::Result.new(
+          chain,
+          task,
+          signal,
+          root: true,
+          id: SecureRandom.uuid_v7,
+          **
+        )
+        chain.unshift(result)
+
+        allow(command).to receive(method).and_return(result)
+
+        result
       end
 
     end

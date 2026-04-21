@@ -15,7 +15,7 @@ RSpec.describe "be_deprecated matcher" do
     context "when task is deprecated" do
       it "passes" do
         task_class = create_task_class(name: "TestTask")
-        task_class.settings(deprecate: true)
+        task_class.deprecation(:warn)
 
         expect(task_class).to be_deprecated
       end
@@ -26,7 +26,7 @@ RSpec.describe "be_deprecated matcher" do
     context "with :warn behavior" do
       it "passes for warn behavior" do
         task_class = create_task_class(name: "TestTask")
-        task_class.settings(deprecate: "warn")
+        task_class.deprecation(:warn)
 
         expect(task_class).to be_deprecated(:warn)
         expect(task_class).to be_deprecated.with_warning
@@ -34,19 +34,19 @@ RSpec.describe "be_deprecated matcher" do
 
       it "fails for other behaviors" do
         task_class = create_task_class(name: "TestTask")
-        task_class.settings(deprecate: "warn")
+        task_class.deprecation(:warn)
 
         expect(task_class).not_to be_deprecated(:log)
-        expect(task_class).not_to be_deprecated(:raise)
+        expect(task_class).not_to be_deprecated(:error)
         expect(task_class).not_to be_deprecated.with_logging
-        expect(task_class).not_to be_deprecated.with_raise
+        expect(task_class).not_to be_deprecated.with_error
       end
     end
 
     context "with :log behavior" do
       it "passes for log behavior" do
         task_class = create_task_class(name: "TestTask")
-        task_class.settings(deprecate: "log")
+        task_class.deprecation(:log)
 
         expect(task_class).to be_deprecated(:log)
         expect(task_class).to be_deprecated.with_logging
@@ -54,27 +54,27 @@ RSpec.describe "be_deprecated matcher" do
 
       it "fails for other behaviors" do
         task_class = create_task_class(name: "TestTask")
-        task_class.settings(deprecate: "log")
+        task_class.deprecation(:log)
 
         expect(task_class).not_to be_deprecated(:warn)
-        expect(task_class).not_to be_deprecated(:raise)
+        expect(task_class).not_to be_deprecated(:error)
         expect(task_class).not_to be_deprecated.with_warning
-        expect(task_class).not_to be_deprecated.with_raise
+        expect(task_class).not_to be_deprecated.with_error
       end
     end
 
-    context "with :raise behavior" do
-      it "passes for raise behavior" do
+    context "with :error behavior" do
+      it "passes for error behavior" do
         task_class = create_task_class(name: "TestTask")
-        task_class.settings(deprecate: "raise")
+        task_class.deprecation(:error)
 
-        expect(task_class).to be_deprecated(:raise)
-        expect(task_class).to be_deprecated.with_raise
+        expect(task_class).to be_deprecated(:error)
+        expect(task_class).to be_deprecated.with_error
       end
 
       it "fails for other behaviors" do
         task_class = create_task_class(name: "TestTask")
-        task_class.settings(deprecate: "raise")
+        task_class.deprecation(:error)
 
         expect(task_class).not_to be_deprecated(:warn)
         expect(task_class).not_to be_deprecated(:log)
@@ -83,31 +83,21 @@ RSpec.describe "be_deprecated matcher" do
       end
     end
 
-    context "with true value" do
-      it "passes for raise behavior (true defaults to raise)" do
-        task_class = create_task_class(name: "TestTask")
-        task_class.settings(deprecate: true)
-
-        expect(task_class).to be_deprecated(:raise)
-        expect(task_class).to be_deprecated.with_raise
-      end
-    end
-
-    context "with custom string behavior" do
+    context "with custom symbol behavior" do
       it "passes for matching behavior" do
         task_class = create_task_class(name: "TestTask")
-        task_class.settings(deprecate: "custom_warn")
+        task_class.deprecation(:custom_handler)
 
-        expect(task_class).to be_deprecated("custom_warn")
-        expect(task_class).to be_deprecated.with_behavior("custom_warn")
+        expect(task_class).to be_deprecated(:custom_handler)
+        expect(task_class).to be_deprecated.with_behavior(:custom_handler)
       end
 
       it "fails for non-matching behavior" do
         task_class = create_task_class(name: "TestTask")
-        task_class.settings(deprecate: "custom_warn")
+        task_class.deprecation(:custom_handler)
 
-        expect(task_class).not_to be_deprecated("custom_log")
-        expect(task_class).not_to be_deprecated.with_behavior("custom_log")
+        expect(task_class).not_to be_deprecated(:other_handler)
+        expect(task_class).not_to be_deprecated.with_behavior(:other_handler)
       end
     end
   end
@@ -116,7 +106,7 @@ RSpec.describe "be_deprecated matcher" do
     context "when with_warning" do
       it "works correctly" do
         task_class = create_task_class(name: "TestTask")
-        task_class.settings(deprecate: "warn")
+        task_class.deprecation(:warn)
 
         expect(task_class).to be_deprecated.with_warning
       end
@@ -125,57 +115,46 @@ RSpec.describe "be_deprecated matcher" do
     context "when with_logging" do
       it "works correctly" do
         task_class = create_task_class(name: "TestTask")
-        task_class.settings(deprecate: "log")
+        task_class.deprecation(:log)
 
         expect(task_class).to be_deprecated.with_logging
       end
     end
 
-    context "when with_raise" do
+    context "when with_error" do
       it "works correctly" do
         task_class = create_task_class(name: "TestTask")
-        task_class.settings(deprecate: "raise")
+        task_class.deprecation(:error)
 
-        expect(task_class).to be_deprecated.with_raise
+        expect(task_class).to be_deprecated.with_error
       end
     end
 
     context "when with_behavior" do
       it "works correctly" do
         task_class = create_task_class(name: "TestTask")
-        task_class.settings(deprecate: "custom_behavior")
+        task_class.deprecation(:custom_behavior)
 
-        expect(task_class).to be_deprecated.with_behavior("custom_behavior")
+        expect(task_class).to be_deprecated.with_behavior(:custom_behavior)
       end
     end
   end
 
   describe "edge cases" do
-    context "with nil deprecate setting" do
+    context "when deprecation has not been declared" do
       it "is not deprecated" do
         task_class = create_task_class(name: "TestTask")
-        task_class.settings(deprecate: nil)
 
         expect(task_class).not_to be_deprecated
       end
     end
 
-    context "with false deprecate setting" do
-      it "is not deprecated" do
+    context "when actual is an instance" do
+      it "reads deprecation off the class" do
         task_class = create_task_class(name: "TestTask")
-        task_class.settings(deprecate: false)
+        task_class.deprecation(:warn)
 
-        expect(task_class).not_to be_deprecated
-      end
-    end
-
-    context "with regex behavior matching" do
-      it "matches partial strings" do
-        task_class = create_task_class(name: "TestTask")
-        task_class.settings(deprecate: "my_warning_system")
-
-        expect(task_class).to be_deprecated(:warn)
-        expect(task_class).to be_deprecated.with_warning
+        expect(task_class.new).to be_deprecated.with_warning
       end
     end
   end
