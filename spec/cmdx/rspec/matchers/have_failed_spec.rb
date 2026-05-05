@@ -24,15 +24,11 @@ RSpec.describe "have_failed matcher" do
       end
 
       it "validates state is INTERRUPTED" do
-        expect(result).to have_failed(state: CMDx::Result::INTERRUPTED)
+        expect(result).to have_failed(state: CMDx::Signal::INTERRUPTED)
       end
 
       it "validates status is FAILED" do
-        expect(result).to have_failed(status: CMDx::Result::FAILED)
-      end
-
-      it "validates cause is a FailFault" do
-        expect(result).to have_failed(cause: be_a(CMDx::FailFault))
+        expect(result).to have_failed(status: CMDx::Signal::FAILED)
       end
     end
   end

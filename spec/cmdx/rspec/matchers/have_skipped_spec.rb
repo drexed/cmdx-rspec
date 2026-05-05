@@ -24,15 +24,11 @@ RSpec.describe "have_skipped matcher" do
       end
 
       it "validates state is INTERRUPTED" do
-        expect(result).to have_skipped(state: CMDx::Result::INTERRUPTED)
+        expect(result).to have_skipped(state: CMDx::Signal::INTERRUPTED)
       end
 
       it "validates status is SKIPPED" do
-        expect(result).to have_skipped(status: CMDx::Result::SKIPPED)
-      end
-
-      it "validates cause is a SkipFault" do
-        expect(result).to have_skipped(cause: be_a(CMDx::SkipFault))
+        expect(result).to have_skipped(status: CMDx::Signal::SKIPPED)
       end
     end
   end

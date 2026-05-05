@@ -12,7 +12,7 @@ Gem::Specification.new do |spec|
   spec.description = spec.summary
   spec.homepage = "https://github.com/drexed/cmdx-rspec"
   spec.license = "MIT"
-  spec.required_ruby_version = ">= 3.1.0"
+  spec.required_ruby_version = ">= 3.3.0"
 
   spec.metadata["homepage_uri"] = spec.homepage
   spec.metadata["source_code_uri"] = "https://github.com/drexed/cmdx-rspec"
@@ -53,7 +53,7 @@ Gem::Specification.new do |spec|
   spec.executables = spec.files.grep(%r{\Aexe/}) { |f| File.basename(f) }
   spec.require_paths = ["lib"]
 
-  spec.add_dependency "cmdx", ">= 1.5.0"
+  spec.add_dependency "cmdx", ">= 2.0.0"
   spec.add_dependency "rspec"
 
   spec.add_development_dependency "bundler"
