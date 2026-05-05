@@ -17,7 +17,7 @@ RSpec.describe "have_middleware matcher" do
   end
 
   it "passes when middleware is registered (instance)" do
-    instance = task_class.middlewares.registry.first
+    instance, = task_class.middlewares.registry.first
     expect(task_class).to have_middleware(instance)
   end
 

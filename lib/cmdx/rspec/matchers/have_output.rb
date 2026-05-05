@@ -32,7 +32,15 @@ RSpec::Matchers.define :have_output do |name, **expected|
     next false if output.nil?
     next true if expected.empty?
 
-    schema = output.to_h
-    expected.all? { |k, v| values_match?(v, schema[k]) }
+    expected.all? do |k, v|
+      actual =
+        case k
+        when :name then output.name
+        when :description then output.description
+        else output.to_h.fetch(:options, {})[k]
+        end
+      actual = false if k == :required && actual.nil?
+      values_match?(v, actual)
+    end
   end
 end

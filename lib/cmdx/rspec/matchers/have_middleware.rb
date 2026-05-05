@@ -18,7 +18,8 @@ RSpec::Matchers.define :have_middleware do |middleware|
     target = actual.is_a?(Class) ? actual : actual.class
     next false unless target.respond_to?(:middlewares)
 
-    target.middlewares.registry.any? do |m|
+    target.middlewares.registry.any? do |entry|
+      m, = entry
       case middleware
       when Class then m.is_a?(middleware) || m == middleware
       else m == middleware
