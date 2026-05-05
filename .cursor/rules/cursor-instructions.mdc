@@ -10,14 +10,17 @@ Follow the official Ruby gem guides for best practices.
 Reference the guides outlined in https://guides.rubygems.org
 
 ## Project Context
-CMDx::RSpec is a collection of RSpec matchers for the CMDx framework.
+CMDx provides a framework for designing and executing complex business logic within service/command objects.
 Reference the CMDx documentation in https://drexed.github.io/cmdx/llms.txt
-Reference the CMDx::RSpec documentation in https://github.com/drexed/cmdx-rspec/blob/main/README.md
 
 ## Technology Stack
-- Ruby 3.4+
-- RSpec 3.1+
-- CMDx 1.5+
+- Ruby 4.0+
+- RSpec 3.13+
+
+## Development Guidelines
+- Performance is critical - benchmark any changes that could affect speed
+- Follow existing code patterns and conventions
+- Maintain backward compatibility for public API
 
 ## Code Style and Structure
 - Write concise, idiomatic Ruby code with accurate examples
@@ -26,6 +29,7 @@ Reference the CMDx::RSpec documentation in https://github.com/drexed/cmdx-rspec/
 - Prefer iteration and modularization over code duplication
 - Use descriptive variable and method names (e.g., user_signed_in?, calculate_total)
 - Write comprehensive code documentation using the Yardoc format
+- Minimize object allocations in hot paths
 
 ## Naming Conventions
 - Use snake_case for file names, method names, and variables
@@ -37,6 +41,7 @@ Reference the CMDx::RSpec documentation in https://github.com/drexed/cmdx-rspec/
 - Use Ruby's expressive syntax (e.g., unless, ||=, &.)
 - Prefer double quotes for strings
 - Respect my Rubocop options
+- Run `bundle exec rubocop .` before finalizing any code changes
 
 ## Performance Optimization
 - Use memoization for expensive operations
@@ -52,6 +57,7 @@ Reference the CMDx::RSpec documentation in https://github.com/drexed/cmdx-rspec/
 - Don't test declarative configuration
 - Use appropriate matchers
 - Update tests and update Yardocs after you write code
+- Run `bundle rspec .` before finalizing any code changes
 
 ## Documentation
 - Utilize the YARDoc format when documenting Ruby code
@@ -59,4 +65,4 @@ Reference the CMDx::RSpec documentation in https://github.com/drexed/cmdx-rspec/
   - Avoid redundant comments that merely restate the code
   - Keep comments up-to-date with code changes
   - Keep documentation consistent
-- Update CHANGELOG.md with any changes
+- Update CHANGELOG.md with any changes (keep with similar voice and style)
