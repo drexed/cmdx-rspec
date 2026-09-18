@@ -6,6 +6,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ## [Unreleased]
 
+### Added
+- Added `build_result`, `build_successful_result`, `build_skipped_result`, `build_failed_result`, and `build_echoed_result` helpers for constructing real `CMDx::Result` objects without stubbing task execution
+
 ## [2.0.0] - Unreleased
 
 ### Added

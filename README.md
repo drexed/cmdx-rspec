@@ -290,6 +290,30 @@ describe MyFeature do
 end
 ```
 
+### Result builders
+
+Build a real `CMDx::Result` without stubbing `execute` — useful when a collaborator must return a result, when seeding a chain, or anywhere you need a result object in isolation. Extra keyword args (besides the documented ones) are forwarded to `task.new` as context data, same as the stubs below.
+
+```ruby
+result = build_successful_result(snapshot:)
+allow(FetchSnapshot).to receive(:execute).and_return(result)
+
+build_skipped_result(reason: "not applicable")
+build_failed_result(reason: "boom", cause: StandardError.new("kaput"))
+build_echoed_result(upstream_failed_result)
+
+build_result(:success, snapshot:, metadata: { id: 1 })
+build_result(:failed, reason: "nope", strict: true, task: SomeTask)
+build_result(:echo, upstream_result: failed_result)
+```
+
+Options:
+
+```ruby
+build_successful_result(task: SomeTask, chain: existing_chain, context: CMDx::Context.new(foo: 1))
+build_result(:success, deprecated: true, retries: 2, rolled_back: true)
+```
+
 ### Stubs
 
 Each stub builds a frozen `CMDx::Result` carrying the requested signal and wires it into a fresh `CMDx::Chain`, so callers see realistic execution shape without invoking the task's `work`. Any extra keyword args (besides the documented ones) are forwarded to `command.new` as context overrides.
@@ -343,8 +367,12 @@ stub_task_deprecated(SomeTask)
 ```ruby
 stub_workflow_tasks(MyWorkflow) do |task|
   case task
-  when TaskC then stub_task_skip(task)
-  else            stub_task_success(task)
+  when TaskB
+    stub_task_fail(task)
+  when TaskC
+    stub_task_skip(task)
+  else
+    stub_task_success(task)
   end
 end
 

@@ -10,6 +10,77 @@ module CMDx
     # Mix into example groups via `config.include CMDx::RSpec::Helpers`.
     module Helpers
 
+      # Anonymous task used by result builders when no +task+ is supplied.
+      STUB_TASK = Class.new(CMDx::Task) do
+        def self.name
+          "CMDx::RSpec::StubTask"
+        end
+      end
+      private_constant :STUB_TASK
+
+      # Builds a frozen {CMDx::Result} without stubbing task execution.
+      # Use when a collaborator must return a result, when seeding a chain,
+      # or anywhere a real result is needed outside `stub_task_*`.
+      #
+      # @param status [Symbol, CMDx::Signal] `:success`, `:skipped`, `:failed`,
+      #   `:echo`, or a pre-built signal
+      # @param reason [String, nil] human-readable outcome reason
+      # @param cause [Exception, nil] originating exception on failure
+      # @param metadata [Hash] signal metadata payload
+      # @param upstream_result [CMDx::Result] required for `:echo`; must be failed
+      # @param task [Class] task class for `result.task` (defaults to an internal stub)
+      # @param chain [CMDx::Chain, nil] chain to join (a fresh one is created when omitted)
+      # @param context [Hash, CMDx::Context, nil] task context; other keyword args
+      #   are forwarded to `task.new` when +context+ is omitted
+      # @param root [Boolean] whether this result is the chain root
+      # @param strict [Boolean] whether the result was produced via `execute!`
+      # @param deprecated [Boolean] whether the result is flagged deprecated
+      # @param retries [Integer] retry count beyond the first attempt
+      # @param duration [Float, nil] execution duration in milliseconds
+      # @param rolled_back [Boolean] whether rollback ran for this result
+      # @param tid [String, nil] execution identifier (defaults to a uuid_v7)
+      # @return [CMDx::Result]
+      # @raise [ArgumentError] for unknown statuses or invalid echo input
+      # @example
+      #   result = build_result(:success, snapshot:)
+      #   allow(FetchSnapshot).to receive(:execute).and_return(result)
+      def build_result(status, **options)
+        signal = resolve_result_signal(
+          status,
+          reason: options[:reason],
+          cause: options[:cause],
+          metadata: options.fetch(:metadata, {}),
+          upstream_result: options[:upstream_result]
+        )
+
+        assemble_result(signal, **options.except(:reason, :cause, :metadata, :upstream_result))
+      end
+
+      # @return [CMDx::Result] a successful result (`state: complete`, `status: success`)
+      # @see #build_result
+      def build_successful_result(metadata: {}, **context)
+        build_result(:success, metadata:, **context)
+      end
+
+      # @return [CMDx::Result] a skipped result (`state: interrupted`, `status: skipped`)
+      # @see #build_result
+      def build_skipped_result(reason: nil, cause: nil, metadata: {}, **context)
+        build_result(:skipped, reason:, cause:, metadata:, **context)
+      end
+
+      # @return [CMDx::Result] a failed result (`state: interrupted`, `status: failed`)
+      # @see #build_result
+      def build_failed_result(reason: nil, cause: nil, metadata: {}, **context)
+        build_result(:failed, reason:, cause:, metadata:, **context)
+      end
+
+      # @param upstream_result [CMDx::Result] the failed result being propagated
+      # @return [CMDx::Result] a failed result echoing +upstream_result+
+      # @see #build_result
+      def build_echoed_result(upstream_result, metadata: {}, **context)
+        build_result(:echo, upstream_result:, metadata:, **context)
+      end
+
       # Stubs `command.execute` to return a frozen successful Result.
       #
       # @param command [Class] the Task class to stub
@@ -318,9 +389,66 @@ module CMDx
 
       private
 
+      # @api private
+      def resolve_result_signal(status, reason:, cause:, metadata:, upstream_result:)
+        case status
+        when CMDx::Signal
+          status
+        when :success, :successful
+          CMDx::Signal.success(reason, metadata:, cause:)
+        when :skip, :skipped
+          CMDx::Signal.skipped(reason, metadata:, cause:)
+        when :fail, :failed, :failure
+          CMDx::Signal.failed(reason, metadata:, cause:)
+        when :echo, :echoed
+          validate_echo_upstream!(upstream_result)
+          CMDx::Signal.echoed(upstream_result, metadata:, cause:)
+        else
+          raise ArgumentError, "unknown result status #{status.inspect}"
+        end
+      end
+
+      # @api private
+      def validate_echo_upstream!(upstream_result)
+        return if upstream_result.is_a?(CMDx::Result) && upstream_result.failed?
+
+        raise ArgumentError, "upstream_result must be a failed CMDx::Result"
+      end
+
+      # Constructs a frozen {CMDx::Result} from +signal+ and wires it into a
+      # {CMDx::Chain} so callers observe the same shape as a real execution.
+      #
+      # @api private
+      # @return [CMDx::Result]
+      LIFECYCLE_OPTIONS = %i[root strict deprecated retries duration rolled_back tid].freeze
+      private_constant :LIFECYCLE_OPTIONS
+
+      def assemble_result(signal, task: nil, chain: nil, context: nil, **options)
+        context_data = options.except(*LIFECYCLE_OPTIONS)
+        task_class    = task || STUB_TASK
+        context_input = context || context_data
+        task_instance = task_class.new(context_input)
+        chain       ||= CMDx::Chain.new
+        result        = CMDx::Result.new(
+          chain,
+          task_instance,
+          signal,
+          root: options.fetch(:root, true),
+          strict: options.fetch(:strict, false),
+          deprecated: options.fetch(:deprecated, false),
+          retries: options.fetch(:retries, 0),
+          duration: options.fetch(:duration, nil),
+          rolled_back: options.fetch(:rolled_back, false),
+          tid: options.fetch(:tid, SecureRandom.uuid_v7)
+        )
+
+        chain.unshift(result)
+
+        result
+      end
+
       # Constructs a frozen {CMDx::Result} from `signal` and stubs `command.method`
-      # to return it. The Result is unshifted onto a new {CMDx::Chain} so callers
-      # observe the same shape as a real execution.
+      # to return it.
       #
       # @api private
       # @param command [Class] the Task class being stubbed
@@ -329,21 +457,8 @@ module CMDx
       # @param context [Hash] context overrides for `command.new`
       # @return [CMDx::Result] the frozen Result installed on the stub
       def build_stub(command, method, signal, context, **)
-        task   = command.new(context)
-        chain  = CMDx::Chain.new
-        result = CMDx::Result.new(
-          chain,
-          task,
-          signal,
-          root: true,
-          id: SecureRandom.uuid_v7,
-          **
-        )
-
-        chain.unshift(result)
-
+        result = assemble_result(signal, task: command, context:, **)
         allow(command).to receive(method).and_return(result)
-
         result
       end
 
