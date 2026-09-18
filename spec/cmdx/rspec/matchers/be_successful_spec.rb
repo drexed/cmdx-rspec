@@ -36,11 +36,13 @@ RSpec.describe "be_successful matcher" do
   describe "edge cases" do
     context "with non-CMDx::Result input" do
       it "raises ArgumentError for string" do
-        expect { expect("not a result").to be_successful }.to raise_error(ArgumentError, "must be a CMDx::Result")
+        not_a_result = "not a result"
+        expect { expect(not_a_result).to be_successful }.to raise_error(ArgumentError, "must be a CMDx::Result")
       end
 
       it "raises ArgumentError for nil" do
-        expect { expect(nil).to be_successful }.to raise_error(ArgumentError, "must be a CMDx::Result")
+        not_a_result = nil
+        expect { expect(not_a_result).to be_successful }.to raise_error(ArgumentError, "must be a CMDx::Result")
       end
 
       it "raises ArgumentError for arbitrary object" do
