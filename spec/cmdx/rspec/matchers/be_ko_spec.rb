@@ -16,6 +16,7 @@ RSpec.describe "be_ko matcher" do
   end
 
   it "raises on non-Result input" do
-    expect { expect(:nope).to be_ko }.to raise_error(ArgumentError, "must be a CMDx::Result")
+    invalid_input = :nope
+    expect { expect(invalid_input).to be_ko }.to raise_error(ArgumentError, "must be a CMDx::Result")
   end
 end

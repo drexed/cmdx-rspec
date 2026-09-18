@@ -19,7 +19,8 @@ RSpec.describe "be_complete matcher" do
   end
 
   it "raises on non-Result input" do
-    expect { expect(:nope).to be_complete }.to raise_error(ArgumentError, "must be a CMDx::Result")
+    invalid_input = :nope
+    expect { expect(invalid_input).to be_complete }.to raise_error(ArgumentError, "must be a CMDx::Result")
   end
 
   it "describes" do

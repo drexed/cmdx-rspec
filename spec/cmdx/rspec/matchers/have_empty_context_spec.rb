@@ -6,7 +6,8 @@ RSpec.describe "have_empty_context matcher" do
   describe "basic empty context checking" do
     context "when context is an empty Hash" do
       it "passes" do
-        expect({}).to have_empty_context
+        context = {}
+        expect(context).to have_empty_context
       end
     end
 
@@ -34,7 +35,8 @@ RSpec.describe "have_empty_context matcher" do
   describe "non-empty context validation" do
     context "with Hash containing data" do
       it "fails for non-empty hash" do
-        expect { expect({ key: "value" }).to have_empty_context }.to raise_error(RSpec::Expectations::ExpectationNotMetError)
+        context = { key: "value" }
+        expect { expect(context).to have_empty_context }.to raise_error(RSpec::Expectations::ExpectationNotMetError)
       end
     end
 
@@ -64,13 +66,15 @@ RSpec.describe "have_empty_context matcher" do
   describe "edge cases" do
     context "with nil input" do
       it "raises error for nil" do
-        expect { expect(nil).to have_empty_context }.to raise_error("unknown context type NilClass")
+        invalid_input = nil
+        expect { expect(invalid_input).to have_empty_context }.to raise_error("unknown context type NilClass")
       end
     end
 
     context "with string input" do
       it "raises error for string" do
-        expect { expect("not a context").to have_empty_context }.to raise_error("unknown context type String")
+        invalid_input = "not a context"
+        expect { expect(invalid_input).to have_empty_context }.to raise_error("unknown context type String")
       end
     end
 
