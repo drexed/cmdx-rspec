@@ -422,6 +422,26 @@ expected_no_task_execution!(SomeTask)
 expected_no_task_execution(SomeTask, some: "value")
 ```
 
+### RuboCop: `RSpec/NoExpectationExample`
+
+The [RSpec/NoExpectationExample](https://docs.rubocop.org/rubocop-rspec/latest/cops_rspec.html#rspecnoexpectationexample) cop flags examples that do not call an RSpec expectation (for example `expect`, `is_expected`, or `should`). That is intentional for examples whose only assertion is a message expectation registered by [`expect_task_execution`](#mocks), [`expect_no_task_execution`](#mocks), or the bang variants — those helpers call `expect(command).to receive(...)` internally, but the example body often contains no top-level `expect`.
+
+RuboCop already treats method names matching `^expect_` and `^assert_` as expectations via the cop’s default `AllowedPatterns`. Add `^expected_` if you use the post-action [`expected_*`](#mocks) helpers (`expected_task_execution`, `expected_no_task_execution`, and their `!` variants), which assert with `have_received` instead of `receive`.
+
+Merge the following into `.rubocop.yml` (adjust if your file already configures this cop):
+
+```yaml
+RSpec/NoExpectationExample:
+  AllowedPatterns:
+    - "^expect_"
+    - "^expected_"
+    - "^assert_"
+```
+
+Examples that only stub or exercise behavior with an explicit matcher — for example `stub_task_success` followed by `expect(result).to be_successful` — do not need an allowed pattern. Workflow setup with `stub_workflow_tasks` is the same when you assert on outcomes afterward.
+
+If you define your own expectation helpers, either name them with an `expect_` / `assert_` prefix or register them under `RSpec/Language/Expectations` in `.rubocop.yml` as described in the cop documentation.
+
 ### Diagnostics
 
 #### `capture_cmdx_logs`
