@@ -13,6 +13,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 - Task stub helpers — raise `ArgumentError` when `command` is not a `CMDx::Task` subclass
 
 ### Changed
+- Task execution expectation helpers (`unstub_task`, `expect_task_execution`, `expected_task_execution`, and their `!` variants) — optional positional arguments are forwarded to RSpec's `.with` matcher alongside keyword context
 - `build_echoed_result` and `stub_task_throw` — echo upstream validation now raises with message `upstream result must be a failed CMDx::Result`
 - `stub_task_fail!` — stubbed `execute!` now raises `CMDx::Fault` (or re-raises `cause`) instead of returning a failed result, matching CMDx strict execution
 

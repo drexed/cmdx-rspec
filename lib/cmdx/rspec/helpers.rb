@@ -290,11 +290,11 @@ module CMDx
       # @param command [Class] the Task class to unstub
       # @param context [Hash{Symbol => Object}] argument signature whose stub to release
       # @return [void]
-      def unstub_task(command, **context)
-        if context.empty?
+      def unstub_task(command, *args, **context)
+        if args.empty? && context.empty?
           allow(command).to receive(:execute).and_call_original
         else
-          allow(command).to receive(:execute).with(**context).and_call_original
+          allow(command).to receive(:execute).with(*args, **context).and_call_original
         end
       end
 
@@ -304,11 +304,11 @@ module CMDx
       # @param command [Class] the Task class to unstub
       # @param context [Hash{Symbol => Object}] argument signature whose stub to release
       # @return [void]
-      def unstub_task!(command, **context)
-        if context.empty?
+      def unstub_task!(command, *args, **context)
+        if args.empty? && context.empty?
           allow(command).to receive(:execute!).and_call_original
         else
-          allow(command).to receive(:execute!).with(**context).and_call_original
+          allow(command).to receive(:execute!).with(*args, **context).and_call_original
         end
       end
 
@@ -318,11 +318,11 @@ module CMDx
       # @param command [Class] the Task class to expect
       # @param context [Hash{Symbol => Object}] argument signature to match
       # @return [RSpec::Mocks::MessageExpectation]
-      def expect_task_execution(command, **context)
-        if context.empty?
+      def expect_task_execution(command, *args, **context)
+        if args.empty? && context.empty?
           expect(command).to receive(:execute)
         else
-          expect(command).to receive(:execute).with(**context)
+          expect(command).to receive(:execute).with(*args, **context)
         end
       end
 
@@ -332,11 +332,11 @@ module CMDx
       # @param command [Class] the Task class to expect
       # @param context [Hash{Symbol => Object}] argument signature to match
       # @return [RSpec::Mocks::MessageExpectation]
-      def expect_task_execution!(command, **context)
-        if context.empty?
+      def expect_task_execution!(command, *args, **context)
+        if args.empty? && context.empty?
           expect(command).to receive(:execute!)
         else
-          expect(command).to receive(:execute!).with(**context)
+          expect(command).to receive(:execute!).with(*args, **context)
         end
       end
 
@@ -346,11 +346,11 @@ module CMDx
       # @param command [Class] the Task class to guard
       # @param context [Hash{Symbol => Object}] argument signature to forbid
       # @return [RSpec::Mocks::MessageExpectation]
-      def expect_no_task_execution(command, **context)
-        if context.empty?
+      def expect_no_task_execution(command, *args, **context)
+        if args.empty? && context.empty?
           expect(command).not_to receive(:execute)
         else
-          expect(command).not_to receive(:execute).with(**context)
+          expect(command).not_to receive(:execute).with(*args, **context)
         end
       end
 
@@ -360,11 +360,11 @@ module CMDx
       # @param command [Class] the Task class to guard
       # @param context [Hash{Symbol => Object}] argument signature to forbid
       # @return [RSpec::Mocks::MessageExpectation]
-      def expect_no_task_execution!(command, **context)
-        if context.empty?
+      def expect_no_task_execution!(command, *args, **context)
+        if args.empty? && context.empty?
           expect(command).not_to receive(:execute!)
         else
-          expect(command).not_to receive(:execute!).with(**context)
+          expect(command).not_to receive(:execute!).with(*args, **context)
         end
       end
 
@@ -376,11 +376,11 @@ module CMDx
       # @param command [Class] the Task class to assert against
       # @param context [Hash{Symbol => Object}] argument signature to match
       # @return [RSpec::Mocks::Matchers::HaveReceived]
-      def expected_task_execution(command, **context)
-        if context.empty?
+      def expected_task_execution(command, *args, **context)
+        if args.empty? && context.empty?
           expect(command).to have_received(:execute)
         else
-          expect(command).to have_received(:execute).with(**context)
+          expect(command).to have_received(:execute).with(*args, **context)
         end
       end
 
@@ -391,11 +391,11 @@ module CMDx
       # @param command [Class] the Task class to assert against
       # @param context [Hash{Symbol => Object}] argument signature to match
       # @return [RSpec::Mocks::Matchers::HaveReceived]
-      def expected_task_execution!(command, **context)
-        if context.empty?
+      def expected_task_execution!(command, *args, **context)
+        if args.empty? && context.empty?
           expect(command).to have_received(:execute!)
         else
-          expect(command).to have_received(:execute!).with(**context)
+          expect(command).to have_received(:execute!).with(*args, **context)
         end
       end
 
@@ -406,11 +406,11 @@ module CMDx
       # @param command [Class] the Task class to assert against
       # @param context [Hash{Symbol => Object}] argument signature to forbid
       # @return [RSpec::Mocks::Matchers::HaveReceived]
-      def expected_no_task_execution(command, **context)
-        if context.empty?
+      def expected_no_task_execution(command, *args, **context)
+        if args.empty? && context.empty?
           expect(command).not_to have_received(:execute)
         else
-          expect(command).not_to have_received(:execute).with(**context)
+          expect(command).not_to have_received(:execute).with(*args, **context)
         end
       end
 
@@ -421,11 +421,11 @@ module CMDx
       # @param command [Class] the Task class to assert against
       # @param context [Hash{Symbol => Object}] argument signature to forbid
       # @return [RSpec::Mocks::Matchers::HaveReceived]
-      def expected_no_task_execution!(command, **context)
-        if context.empty?
+      def expected_no_task_execution!(command, *args, **context)
+        if args.empty? && context.empty?
           expect(command).not_to have_received(:execute!)
         else
-          expect(command).not_to have_received(:execute!).with(**context)
+          expect(command).not_to have_received(:execute!).with(*args, **context)
         end
       end
 
