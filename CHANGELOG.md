@@ -8,6 +8,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ### Added
 - Added `build_result`, `build_successful_result`, `build_skipped_result`, `build_failed_result`, and `build_echoed_result` helpers for constructing real `CMDx::Result` objects without stubbing task execution
+- Added `stub_task` and `stub_task!` alias of `stub_task_success` and `stub_task_success!`
 - Task stub helpers — raise `ArgumentError` when `command` is not a `CMDx::Task` subclass
 
 ### Changed

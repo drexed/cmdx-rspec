@@ -322,18 +322,18 @@ Each stub builds a frozen `CMDx::Result` carrying the requested signal and wires
 
 ```ruby
 # Non-bang variants stub `SomeTask.execute`
-stub_task_success(SomeTask)
+stub_task_success(SomeTask) || stub_task(SomeTask)
 stub_task_skip(SomeTask)
 stub_task_fail(SomeTask)
 
 # Bang variants stub `SomeTask.execute!`
-stub_task_success!(SomeTask)                      # Returns result
-stub_task_skip!(SomeTask)                         # Returns result
-stub_task_fail!(SomeTask)                         # Raises CMDx::Fault
+stub_task_success!(SomeTask) || stub_task!(SomeTask) # Returns result
+stub_task_skip!(SomeTask)                            # Returns result
+stub_task_fail!(SomeTask)                            # Raises CMDx::Fault
 
 # Stub a specific argument signature
-stub_task_success(SomeTask, some: "value")        # SomeTask.execute(some: "value")
-stub_task_skip!(SomeTask, some: "value")          # SomeTask.execute!(some: "value")
+stub_task_success(SomeTask, some: "value")           # SomeTask.execute(some: "value")
+stub_task_skip!(SomeTask, some: "value")             # SomeTask.execute!(some: "value")
 ```
 
 Common options:

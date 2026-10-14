@@ -92,6 +92,7 @@ module CMDx
       def stub_task_success(command, metadata: {}, **context)
         build_stub(command, :execute, CMDx::Signal.success(nil, metadata:), context)
       end
+      alias stub_task stub_task_success
 
       # Stubs `command.execute!` (bang variant) to return a frozen successful Result.
       #
@@ -102,6 +103,7 @@ module CMDx
       def stub_task_success!(command, metadata: {}, **context)
         build_stub(command, :execute!, CMDx::Signal.success(nil, metadata:), context, strict: true)
       end
+      alias stub_task! stub_task_success!
 
       # Stubs `command.execute` to return a frozen skipped Result.
       #
