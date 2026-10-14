@@ -15,7 +15,7 @@ RSpec.describe "CMDx::RSpec::Helpers build_echoed_result" do
     it "raises when given a non-failed result" do
       ok = build_successful_result
 
-      expect { build_echoed_result(ok) }.to raise_error(ArgumentError, "upstream_result must be a failed CMDx::Result")
+      expect { build_echoed_result(ok) }.to raise_error(ArgumentError, "upstream result must be a failed CMDx::Result")
     end
   end
 end

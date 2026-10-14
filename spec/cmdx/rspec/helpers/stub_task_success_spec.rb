@@ -22,6 +22,16 @@ RSpec.describe "CMDx::RSpec::Helpers stub_task_success" do
 
         expect(result).to be_successful
       end
+
+      it "uses the stubbed command for result.task" do
+        result = stub_task_success(task_class)
+
+        expect(result.task).to eq(task_class)
+      end
+
+      it "raises when command is not a Task class" do
+        expect { stub_task_success(String) }.to raise_error(ArgumentError, "command must be a Task class")
+      end
     end
   end
 

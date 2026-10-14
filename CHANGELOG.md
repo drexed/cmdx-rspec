@@ -8,6 +8,13 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ### Added
 - Added `build_result`, `build_successful_result`, `build_skipped_result`, `build_failed_result`, and `build_echoed_result` helpers for constructing real `CMDx::Result` objects without stubbing task execution
+- Task stub helpers — raise `ArgumentError` when `command` is not a `CMDx::Task` subclass
+
+### Changed
+- `build_echoed_result` and `stub_task_throw` — echo upstream validation now raises with message `upstream result must be a failed CMDx::Result`
+
+### Fixed
+- Task stub helpers — stubbed results now use the supplied command class for `result.task`
 
 ## [2.0.0] - Unreleased
 

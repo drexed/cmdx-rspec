@@ -181,11 +181,7 @@ module CMDx
       # @param context [Hash{Symbol => Object}]
       # @return [CMDx::Result] the frozen Result installed on the stub
       def stub_task_throw(command, upstream_result, metadata: {}, **context)
-        unless upstream_result.is_a?(CMDx::Result) && upstream_result.failed?
-          raise ArgumentError,
-                "upstream_result must be a failed CMDx::Result"
-        end
-
+        validate_echo_upstream!(upstream_result)
         build_stub(command, :execute, CMDx::Signal.echoed(upstream_result, metadata:), context)
       end
 
@@ -412,7 +408,7 @@ module CMDx
       def validate_echo_upstream!(upstream_result)
         return if upstream_result.is_a?(CMDx::Result) && upstream_result.failed?
 
-        raise ArgumentError, "upstream_result must be a failed CMDx::Result"
+        raise ArgumentError, "upstream result must be a failed CMDx::Result"
       end
 
       # Constructs a frozen {CMDx::Result} from +signal+ and wires it into a
@@ -424,7 +420,7 @@ module CMDx
       private_constant :LIFECYCLE_OPTIONS
 
       def assemble_result(signal, task: nil, chain: nil, context: nil, **options)
-        context_data = options.except(*LIFECYCLE_OPTIONS)
+        context_data  = options.except(*LIFECYCLE_OPTIONS)
         task_class    = task || STUB_TASK
         context_input = context || context_data
         task_instance = task_class.new(context_input)
@@ -457,7 +453,9 @@ module CMDx
       # @param context [Hash] context overrides for `command.new`
       # @return [CMDx::Result] the frozen Result installed on the stub
       def build_stub(command, method, signal, context, **)
-        result = assemble_result(signal, task: command, context:, **)
+        raise ArgumentError, "command must be a Task class" unless command <= CMDx::Task
+
+        result = assemble_result(signal, **, task: command, context:)
         allow(command).to receive(method).and_return(result)
         result
       end
