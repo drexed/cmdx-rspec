@@ -45,6 +45,11 @@ RSpec/MultipleMemoizedHelpers:
   Enabled: false
 RSpec/NestedGroups:
   Enabled: false
+RSpec/NoExpectationExample:
+  AllowedPatterns:
+    - "^expect_"
+    - "^expected_"
+    - "^assert_"
 RSpec/SpecFilePathFormat:
   CustomTransform:
     CMDx: cmdx

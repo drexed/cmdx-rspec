@@ -411,6 +411,15 @@ expect_task_execution(SomeTask, some: "value")
 expect_no_task_execution(SomeTask)
 expect_no_task_execution!(SomeTask)
 expect_no_task_execution(SomeTask, some: "value")
+
+# after the fact; requires a spy
+expected_task_execution(SomeTask)
+expected_task_execution!(SomeTask)
+expected_task_execution(SomeTask, some: "value")
+
+expected_no_task_execution(SomeTask)
+expected_no_task_execution!(SomeTask)
+expected_no_task_execution(SomeTask, some: "value")
 ```
 
 ### Diagnostics

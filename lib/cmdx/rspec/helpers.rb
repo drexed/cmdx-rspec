@@ -368,6 +368,67 @@ module CMDx
         end
       end
 
+      # Asserts that `command.execute` was invoked (after the fact). Requires a
+      # prior spy, e.g. `allow(command).to receive(:execute).and_call_original`
+      # or a `stub_task_*` helper. When `context` is supplied, the assertion is
+      # constrained to that signature.
+      #
+      # @param command [Class] the Task class to assert against
+      # @param context [Hash{Symbol => Object}] argument signature to match
+      # @return [RSpec::Mocks::Matchers::HaveReceived]
+      def expected_task_execution(command, **context)
+        if context.empty?
+          expect(command).to have_received(:execute)
+        else
+          expect(command).to have_received(:execute).with(**context)
+        end
+      end
+
+      # Asserts that `command.execute!` was invoked (after the fact). Requires a
+      # prior spy on `execute!`. When `context` is supplied, the assertion is
+      # constrained to that signature.
+      #
+      # @param command [Class] the Task class to assert against
+      # @param context [Hash{Symbol => Object}] argument signature to match
+      # @return [RSpec::Mocks::Matchers::HaveReceived]
+      def expected_task_execution!(command, **context)
+        if context.empty?
+          expect(command).to have_received(:execute!)
+        else
+          expect(command).to have_received(:execute!).with(**context)
+        end
+      end
+
+      # Asserts that `command.execute` was not invoked (after the fact). Requires
+      # a prior spy on `execute`. When `context` is supplied, only the matching
+      # signature is checked.
+      #
+      # @param command [Class] the Task class to assert against
+      # @param context [Hash{Symbol => Object}] argument signature to forbid
+      # @return [RSpec::Mocks::Matchers::HaveReceived]
+      def expected_no_task_execution(command, **context)
+        if context.empty?
+          expect(command).not_to have_received(:execute)
+        else
+          expect(command).not_to have_received(:execute).with(**context)
+        end
+      end
+
+      # Asserts that `command.execute!` was not invoked (after the fact). Requires
+      # a prior spy on `execute!`. When `context` is supplied, only the matching
+      # signature is checked.
+      #
+      # @param command [Class] the Task class to assert against
+      # @param context [Hash{Symbol => Object}] argument signature to forbid
+      # @return [RSpec::Mocks::Matchers::HaveReceived]
+      def expected_no_task_execution!(command, **context)
+        if context.empty?
+          expect(command).not_to have_received(:execute!)
+        else
+          expect(command).not_to have_received(:execute!).with(**context)
+        end
+      end
+
       # Yields each distinct Task class reachable from a Workflow's pipeline,
       # in first-seen order, so callers can stub them in a single block.
       #
