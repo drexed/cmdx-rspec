@@ -139,14 +139,16 @@ module CMDx
         build_stub(command, :execute, CMDx::Signal.failed(reason, metadata:, cause:), context)
       end
 
-      # Stubs `command.execute!` (bang variant) to return a frozen failed Result.
+      # Stubs `command.execute!` so a call raises like real strict execution:
+      # {CMDx::Fault} for signal failures, or the original exception when
+      # +cause+ is set (mirrors {CMDx::Runtime#raise_signal!}).
       #
       # @param command [Class] the Task class to stub
       # @param reason [String, nil] human-readable failure reason
       # @param cause [Exception, nil] originating cause attached to the signal
       # @param metadata [Hash] payload exposed via `result.metadata`
       # @param context [Hash{Symbol => Object}] context overrides forwarded to `command.new`
-      # @return [CMDx::Result] the frozen Result installed on the stub
+      # @return [CMDx::Result] the frozen failed Result backing the stub (for inspection)
       def stub_task_fail!(command, reason: nil, cause: nil, metadata: {}, **context)
         build_stub(command, :execute!, CMDx::Signal.failed(reason, metadata:, cause:), context, strict: true)
       end
@@ -209,8 +211,10 @@ module CMDx
         raise ArgumentError, "block required" unless block_given?
 
         io = StringIO.new
-        previous = CMDx.configuration.logger
-        CMDx.configuration.logger = Logger.new(io, formatter: previous&.formatter || CMDx::LogFormatters::Line.new)
+        previous  = CMDx.configuration.logger
+        formatter = previous&.formatter || CMDx::LogFormatters::Line.new
+
+        CMDx.configuration.logger = Logger.new(io, formatter:)
         yield
         io.string.lines.map(&:chomp)
       ensure
@@ -239,8 +243,8 @@ module CMDx
         telemetry = command.telemetry
         listener  = ->(event) { captured << event }
 
-        events.each { |e| telemetry.subscribe(e, listener) }
         begin
+          events.each { |e| telemetry.subscribe(e, listener) }
           yield
         ensure
           events.each { |e| telemetry.unsubscribe(e, listener) }
@@ -266,12 +270,10 @@ module CMDx
 
         captured  = nil
         telemetry = command.telemetry
-        listener  = lambda do |event|
-          captured ||= event.payload[:result].chain if event.root
-        end
+        listener  = ->(event) { captured ||= event.payload[:result].chain if event.root }
 
-        telemetry.subscribe(:task_executed, listener)
         begin
+          telemetry.subscribe(:task_executed, listener)
           yield
         ensure
           telemetry.unsubscribe(:task_executed, listener)
@@ -452,12 +454,28 @@ module CMDx
       # @param signal [CMDx::Signal] outcome payload to wrap
       # @param context [Hash] context overrides for `command.new`
       # @return [CMDx::Result] the frozen Result installed on the stub
-      def build_stub(command, method, signal, context, **)
+      def build_stub(command, method, signal, context, **options)
         raise ArgumentError, "command must be a Task class" unless command <= CMDx::Task
 
-        result = assemble_result(signal, **, task: command, context:)
-        allow(command).to receive(method).and_return(result)
+        result = assemble_result(signal, **options, task: command, context:)
+
+        if options.fetch(:strict, false) && result.failed?
+          allow(command).to receive(method) { raise_strict_failure!(result) }
+        else
+          allow(command).to receive(method).and_return(result)
+        end
+
         result
+      end
+
+      # @api private
+      # @param result [CMDx::Result] a failed strict result
+      # @raise [CMDx::Fault, StandardError]
+      def raise_strict_failure!(result)
+        cause = result.cause
+        raise(cause) if cause && !cause.is_a?(CMDx::Fault)
+
+        raise(CMDx::Fault, result.caused_failure, cause:)
       end
 
     end

@@ -12,6 +12,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ### Changed
 - `build_echoed_result` and `stub_task_throw` — echo upstream validation now raises with message `upstream result must be a failed CMDx::Result`
+- `stub_task_fail!` — stubbed `execute!` now raises `CMDx::Fault` (or re-raises `cause`) instead of returning a failed result, matching CMDx strict execution
 
 ### Fixed
 - Task stub helpers — stubbed results now use the supplied command class for `result.task`
