@@ -8,8 +8,8 @@ CMDx provides a framework for designing and executing complex
 business logic within service/command objects.
 
 ## Technology Stack
-- Ruby 3.4+
-- RSpec 3.1+
+- Ruby 3.3+ (CI also runs 3.4 and 4.0)
+- RSpec 3.13+
 
 ## Code Style and Structure
 - Write concise, idiomatic Ruby code with accurate examples

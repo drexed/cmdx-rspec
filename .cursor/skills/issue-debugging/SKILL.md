@@ -71,7 +71,7 @@ Identify **why** the bug exists, not just **where**. Use evidence, not guesswork
 
 Check these common root causes in priority order:
 
-1. **Mismatched `execute` vs `execute!`** — `execute` swallows faults and returns a result; `execute!` re-raises as `SkipFault`/`FailFault`. Nested tasks using the wrong variant will silently swallow or unexpectedly raise.
+1. **Mismatched `execute` vs `execute!`** — `execute` always returns a `Result`; `execute!` re-raises `CMDx::Fault` (or the original `cause`) on failure only. Skips and successes still return a result. Nested tasks using the wrong variant will silently swallow or unexpectedly raise.
 2. **Signal already thrown** — calling `success!`/`skip!`/`fail!` after one was already thrown raises `"halt signal already thrown"`. Check for conditional branches that double-signal.
 3. **Context frozen after `Result#freeze`** — `Result.new` calls `freeze`, which cascades to `Context#freeze` → `@table.freeze`. Tasks that mutate context after a result is generated will hit `FrozenError`.
 4. **String key vs symbol key** — `Context` calls `transform_keys(&:to_sym)` on initialization. Passing string keys to `fetch` or `key?` without `.to_sym` returns `nil` or `false`.

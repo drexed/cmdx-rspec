@@ -39,7 +39,7 @@ Evaluate every change against these dimensions in priority order:
 - Are edge cases handled: nil, empty, frozen, boundary values, error paths?
 - Do the tests actually verify the behavior? Are they testing the right things?
 - Are there race conditions, off-by-one errors, or state inconsistencies?
-- Are `execute` vs `execute!` semantics used correctly? (`execute` swallows faults; `execute!` re-raises as `SkipFault`/`FailFault`)
+- Are `execute` vs `execute!` semantics used correctly? (`execute` always returns a `Result`; `execute!` re-raises `CMDx::Fault` or the original `cause` on failure only — skips and successes still return a result)
 - Is only one of `success!`/`skip!`/`fail!` reachable per execution path? Double-signaling raises `"halt signal already thrown"`.
 - Does `catch`/`throw` flow control use `Signal::TAG` (`:cmdx`) — never caught outside `Runtime#execute_work`?
 - Are context mutations completed **before** signaling? `Result.new` freezes the context.

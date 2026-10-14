@@ -14,7 +14,7 @@ CMDx provides a framework for designing and executing complex business logic wit
 Reference the CMDx documentation in https://drexed.github.io/cmdx/llms.txt
 
 ## Technology Stack
-- Ruby 4.0+
+- Ruby 3.3+ (CI also runs 3.4 and 4.0)
 - RSpec 3.13+
 
 ## Development Guidelines

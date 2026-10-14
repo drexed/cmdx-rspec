@@ -38,6 +38,14 @@ require "cmdx/rspec"
 
 This loads every matcher under `RSpec::Matchers` and exposes the helpers under `CMDx::RSpec::Helpers`. See [Helpers](#helpers) for how to mix the helpers into your example groups.
 
+### Relationship to the CMDx testing guide
+
+The [CMDx testing docs](https://drexed.github.io/cmdx/testing/) use RSpec’s built-in predicate matchers on `CMDx::Result` — for example `be_success` calls `success?`, `be_failed` calls `failed?`, and `be_skipped` calls `skipped?`.
+
+This gem adds matchers that pin both **state** and **status** via `result.to_h` (`be_successful`, `have_skipped`, `have_failed`), plus declaration matchers, chain helpers, and stub/build utilities. You can use both styles in the same suite.
+
+For `execute!`, CMDx only raises when the outcome is **failed** (a `CMDx::Fault`, or the original exception when `result.cause` is a non-fault). Skips and successes return a result even in strict mode.
+
 ## Matchers
 
 All result-oriented matchers raise `ArgumentError` when given a subject that isn't a `CMDx::Result`. Class-oriented matchers accept either the Task class or an instance.
@@ -46,7 +54,7 @@ All result-oriented matchers raise `ArgumentError` when given a subject that isn
 
 #### `be_successful`
 
-Asserts a `CMDx::Result` completed with `state: complete` and `status: success`. Extra keyword args are forwarded to a `result.to_h` inclusion check, so any field can be constrained inline.
+Asserts a `CMDx::Result` completed with `state: "complete"` and `status: "success"`. Extra keyword args are forwarded to a `result.to_h` inclusion check, so any field can be constrained inline.
 
 ```ruby
 expect(SomeTask.execute).to be_successful
@@ -55,19 +63,16 @@ expect(SomeTask.execute).to be_successful(metadata: { id: 1 })
 
 #### `have_skipped`
 
-Asserts a result was skipped (`state: interrupted`, `status: skipped`). Extra keyword args constrain other `result.to_h` fields.
+Asserts a result was skipped (`state: "interrupted"`, `status: "skipped"`). Extra keyword args constrain other `result.to_h` fields.
 
 ```ruby
 expect(result).to have_skipped
-expect(result).to have_skipped(
-  reason: "out of stock",
-  cause: be_a(CMDx::SkipFault)
-)
+expect(result).to have_skipped(reason: "out of stock", metadata: { code: "NA" })
 ```
 
 #### `have_failed`
 
-Asserts a result failed (`state: interrupted`, `status: failed`). Extra keyword args constrain other `result.to_h` fields.
+Asserts a result failed (`state: "interrupted"`, `status: "failed"`). Extra keyword args constrain other `result.to_h` fields.
 
 ```ruby
 expect(result).to have_failed
@@ -79,7 +84,7 @@ expect(result).to have_failed(
 
 #### `be_ok` / `be_ko`
 
-`be_ok` passes when the result is success or skipped (anything but failed). `be_ko` is its inverse.
+`be_ok` delegates to `Result#ok?` (success or skipped). `be_ko` delegates to `Result#ko?` (skipped or failed). Skipped results satisfy **both** matchers.
 
 ```ruby
 expect(result).to be_ok
@@ -88,7 +93,7 @@ expect(result).to be_ko
 
 #### `be_complete` / `be_interrupted`
 
-State-only assertions. `be_complete` passes when `state == :complete`; `be_interrupted` when `state == :interrupted`.
+State-only assertions. `be_complete` passes when `state == "complete"`; `be_interrupted` when `state == "interrupted"`.
 
 ```ruby
 expect(result).to be_complete
@@ -180,6 +185,8 @@ expect { SomeTask.execute! }
 
 `with_reason` accepts a string (equality) or a Regexp; `with_cause` accepts a class (matches via `is_a?`) or a value (matched with `values_match?`).
 
+In application code you can also use `CMDx::Fault.for?`, `Fault.reason?`, and `Fault.matches?` in `rescue` clauses; this matcher is the RSpec block equivalent for `execute!`.
+
 ### Chains
 
 #### `have_chain_root`
@@ -197,6 +204,8 @@ Passes when the chain's size matches `expected`. Accepts a `CMDx::Chain` or `CMD
 ```ruby
 expect(result).to have_chain_size(3)
 ```
+
+For failure propagation (`origin`, `caused_failure`, `threw_failure`), assert on the result directly — for example `expect(result.caused_failure.task).to eq(ValidateCard)` — as described in the [Result chain analysis](https://drexed.github.io/cmdx/outcomes/result/) docs.
 
 ### Task class declarations
 
@@ -220,7 +229,8 @@ Asserts the class declares the given input/output. Keyword args are matched (par
 
 ```ruby
 expect(SomeTask).to have_input(:user_id)
-expect(SomeTask).to have_input(:user_id, type: :integer, required: true)
+expect(SomeTask).to have_input(:user_id, required: true)
+expect(SomeTask).to have_input(:user_id, options: hash_including(coerce: :integer))
 expect(SomeTask).to have_output(:total, required: true)
 ```
 
@@ -322,14 +332,14 @@ Each stub builds a frozen `CMDx::Result` carrying the requested signal and wires
 
 ```ruby
 # Non-bang variants stub `SomeTask.execute`
-stub_task_success(SomeTask) || stub_task(SomeTask)
+stub_task_success(SomeTask) # alias: stub_task
 stub_task_skip(SomeTask)
 stub_task_fail(SomeTask)
 
 # Bang variants stub `SomeTask.execute!`
-stub_task_success!(SomeTask) || stub_task!(SomeTask) # Returns result
-stub_task_skip!(SomeTask)                            # Returns result
-stub_task_fail!(SomeTask)                            # Raises CMDx::Fault
+stub_task_success!(SomeTask) # alias: stub_task! — returns result
+stub_task_skip!(SomeTask)    # returns result (skips do not raise under execute!)
+stub_task_fail!(SomeTask)    # raises CMDx::Fault, or re-raises cause when set
 
 # Stub a specific argument signature
 stub_task_success(SomeTask, some: "value")           # SomeTask.execute(some: "value")

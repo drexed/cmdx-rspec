@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-# Matcher to verify that a result is "ko" (skipped or failed, anything but success).
+# Matcher to verify that a result is "ko" (skipped or failed), via {CMDx::Result#ko?}.
 #
 # @example
 #   expect(MyCommand.execute).to be_ko

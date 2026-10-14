@@ -60,13 +60,13 @@ def initialize(context = EMPTY_HASH)
 ## Bang Method (raises)
 
 ```ruby
-# Executes the task. Raises on skip or failure instead of returning
-# an interrupted result.
+# Executes the task in strict mode. Returns a result on success or skip;
+# raises on failure.
 #
 # @param context [Hash{Symbol => Object}] initial context values
-# @return [Result] the execution result (always complete/success)
-# @raise [SkipFault] when the task signals skip
-# @raise [FailFault] when the task signals failure or an exception occurs
+# @return [Result] when status is success or skipped
+# @raise [CMDx::Fault] when the task fails via fail!, throw!, or errors
+# @raise [StandardError] when +cause+ on the failed result is a non-fault exception
 #
 # @see .execute
 def self.execute!(context = {}, &)

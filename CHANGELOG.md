@@ -18,7 +18,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 ### Fixed
 - Task stub helpers — stubbed results now use the supplied command class for `result.task`
 
-## [2.0.0] - Unreleased
+## [2.0.0] - 2026-05-05
 
 ### Added
 - Support for CMDx v2

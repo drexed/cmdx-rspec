@@ -91,7 +91,7 @@ Follow these matcher conventions:
 |---|---|
 | Result state/status | `have_attributes(state: CMDx::Signal::COMPLETE, status: CMDx::Signal::SUCCESS, ...)` |
 | Context values | `expect(result.context).to have_attributes(executed: %i[...])` or `be_empty` |
-| Exception raising | `expect { result }.to raise_error(CMDx::FailFault, "message")` |
+| Exception raising | `expect { task.execute! }.to raise_cmdx_fault` or `raise_error(CMDx::Fault)` |
 | Block yielding | `expect { \|b\| described_class.configure(&b) }.to yield_with_args(CMDx::Configuration)` |
 | Collection contents | `contain_exactly(...)` for unordered, `eq([...])` for ordered |
 | Identity | `be(object)` for same object, `eq(value)` for equality |
@@ -149,7 +149,7 @@ Cross-reference the completed spec against `references/checklist.md`.
 | Workflow conditional | Workflow conditionals spec | `task task1, if: :method?` / `if: proc { ... }` / `unless:` |
 | Workflow breakpoints | Workflow breakpoints spec | `settings(workflow_breakpoints: %w[skipped failed])` |
 | Group-level breakpoints | Workflow breakpoints spec | `tasks t1, t2, breakpoints: []` |
-| Bang vs non-bang execution | Workflow/task execution specs | `execute` returns result, `execute!` raises `CMDx::FailFault` |
+| Bang vs non-bang execution | Workflow/task execution specs | `execute` returns result; `execute!` raises `CMDx::Fault` (or `cause`) on failure only |
 | Configuration reset | `cmdx_spec.rb` | `after { described_class.reset_configuration! }` |
 | Runtime context mutation | Conditionals spec | Setup task writes to context, later task reads via `if: proc` |
 
