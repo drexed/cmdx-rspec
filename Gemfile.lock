@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    cmdx-rspec (2.0.0)
+    cmdx-rspec (2.1.0)
       cmdx (>= 2.0.0)
       rspec
 
