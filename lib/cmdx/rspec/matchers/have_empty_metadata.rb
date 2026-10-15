@@ -1,16 +1,37 @@
 # frozen_string_literal: true
 
-# Asserts a {CMDx::Result}'s `metadata` hash is empty. Raises
-# `ArgumentError` when the subject is not a Result.
-#
-# @example
-#   expect(result).to have_empty_metadata
-RSpec::Matchers.define :have_empty_metadata do
-  description { "have an empty metadata" }
+module CMDx # :nodoc:
+  module RSpec
+    module Matchers
+      # Asserts `result.to_h[:metadata]` is empty.
+      #
+      # @see CMDx::RSpec::Matchers#have_empty_metadata
+      #
+      class HaveEmptyMetadata
 
-  match(notify_expectation_failures: true) do |result|
-    raise ArgumentError, "must be a CMDx::Result" unless result.is_a?(CMDx::Result)
+        INSTANCE = new
 
-    expect(result.to_h[:metadata]).to be_empty
+        include DelegatesExpectations
+
+        # @return [String]
+        def description
+          "have an empty metadata"
+        end
+
+        # Materializes deferred fixtures and requires `to_h[:metadata]` to be empty.
+        #
+        # @param result [CMDx::Result] result under test
+        # @return [Boolean]
+        # @raise [ArgumentError] when +result+ is not a {CMDx::Result}
+        # @raise [RSpec::Expectations::ExpectationNotMetError] when metadata is not empty
+        def matches?(result)
+          result = CMDx::RSpec::Support::ResultCoercion.materialize!(result)
+
+          assert_expectation!(result.to_h[:metadata], built_in_empty)
+          true
+        end
+
+      end
+    end
   end
 end

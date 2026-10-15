@@ -1,10 +1,10 @@
 # frozen_string_literal: true
 
-module CMDx
+module CMDx # :nodoc:
   module RSpec
 
-    # Gem version. Bumped on release; mirrored in the gemspec.
-    VERSION = "2.1.0"
+    # Current gem version string (`cmdx-rspec.gemspec` reads this constant).
+    VERSION = "3.0.0"
 
   end
 end

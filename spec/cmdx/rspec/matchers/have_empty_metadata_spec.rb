@@ -3,36 +3,45 @@
 require "spec_helper"
 
 RSpec.describe "have_empty_metadata matcher" do
-  describe "basic empty metadata checking" do
-    context "when result has empty metadata" do
-      it "passes" do
-        task_class = create_task_class(name: "TestTask") do
-          define_method(:work) { :success }
-        end
-        result = task_class.execute(CMDx::Context.new)
-
-        expect(result).to have_empty_metadata
-      end
-    end
+  let(:empty_result) do
+    create_task_class { define_method(:work) { :success } }.execute(CMDx::Context.new)
   end
 
-  describe "non-empty metadata validation" do
-    context "with result containing metadata" do
-      it "fails for result with metadata" do
-        task_class = create_skipping_task(name: "TestTask", user_id: 123)
-        result = task_class.execute(CMDx::Context.new)
+  it "passes when metadata is empty" do
+    expect(empty_result).to have_empty_metadata
+  end
 
-        expect { expect(result).to have_empty_metadata }.to raise_error(RSpec::Expectations::ExpectationNotMetError)
-      end
-    end
+  it "fails when metadata is present" do
+    result = create_skipping_task(user_id: 123).execute(CMDx::Context.new)
 
-    context "with result containing multiple metadata entries" do
-      it "fails for result with multiple metadata entries" do
-        task_class = create_failing_task(name: "TestTask", session_id: "abc123", request_id: "req456")
-        result = task_class.execute(CMDx::Context.new)
+    expect { expect(result).to have_empty_metadata }.to raise_error(RSpec::Expectations::ExpectationNotMetError)
+  end
 
-        expect { expect(result).to have_empty_metadata }.to raise_error(RSpec::Expectations::ExpectationNotMetError)
-      end
-    end
+  it "fails when multiple metadata entries are present" do
+    result = create_failing_task(session_id: "abc123", request_id: "req456").execute(CMDx::Context.new)
+
+    expect { expect(result).to have_empty_metadata }.to raise_error(RSpec::Expectations::ExpectationNotMetError)
+  end
+
+  it "accepts a deferred result fixture with empty metadata" do
+    deferred = CMDx::RSpec::Result.for.and_succeed
+
+    expect(deferred).to have_empty_metadata
+  end
+
+  it "fails when deferred metadata is not empty" do
+    deferred = CMDx::RSpec::Result.for.and_succeed(metadata: { user_id: 1 })
+
+    expect { expect(deferred).to have_empty_metadata }.to raise_error(RSpec::Expectations::ExpectationNotMetError)
+  end
+
+  it "raises on non-Result input" do
+    invalid_input = :nope
+
+    expect { expect(invalid_input).to have_empty_metadata }.to raise_error(ArgumentError, "must be a CMDx::Result")
+  end
+
+  it "describes" do
+    expect(have_empty_metadata.description).to eq("have an empty metadata")
   end
 end

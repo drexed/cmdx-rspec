@@ -18,4 +18,8 @@ RSpec.describe "have_tag matcher" do
   it "fails when tag missing" do
     expect(task_class).not_to have_tag(:nope)
   end
+
+  it "describes" do
+    expect(have_tag(:critical).description).to eq("have tag :critical")
+  end
 end

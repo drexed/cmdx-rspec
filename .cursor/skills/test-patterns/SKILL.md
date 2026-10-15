@@ -91,7 +91,7 @@ Follow these matcher conventions:
 |---|---|
 | Result state/status | `have_attributes(state: CMDx::Signal::COMPLETE, status: CMDx::Signal::SUCCESS, ...)` |
 | Context values | `expect(result.context).to have_attributes(executed: %i[...])` or `be_empty` |
-| Exception raising | `expect { task.execute! }.to raise_cmdx_fault` or `raise_error(CMDx::Fault)` |
+| Exception raising | `expect { task.execute! }.to raise_fault` or `raise_error(CMDx::Fault)` |
 | Block yielding | `expect { \|b\| described_class.configure(&b) }.to yield_with_args(CMDx::Configuration)` |
 | Collection contents | `contain_exactly(...)` for unordered, `eq([...])` for ordered |
 | Identity | `be(object)` for same object, `eq(value)` for equality |

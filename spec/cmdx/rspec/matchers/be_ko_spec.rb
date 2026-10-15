@@ -17,6 +17,17 @@ RSpec.describe "be_ko matcher" do
 
   it "raises on non-Result input" do
     invalid_input = :nope
+
     expect { expect(invalid_input).to be_ko }.to raise_error(ArgumentError, "must be a CMDx::Result")
+  end
+
+  it "accepts a deferred result fixture" do
+    deferred = CMDx::RSpec::Result.for.and_fail(reason: "nope")
+
+    expect(deferred).to be_ko
+  end
+
+  it "describes" do
+    expect(be_ko.description).to eq("have been ko")
   end
 end

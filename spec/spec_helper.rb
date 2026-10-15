@@ -32,7 +32,7 @@ RSpec.configure do |config|
     c.syntax = :expect
   end
 
-  config.include CMDx::RSpec::Helpers
+  config.include CMDx::RSpec::Matchers
   config.include CMDx::Testing::TaskBuilders
   config.include CMDx::Testing::WorkflowBuilders
 

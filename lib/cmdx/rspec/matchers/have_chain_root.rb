@@ -1,30 +1,53 @@
 # frozen_string_literal: true
 
-# Matcher to verify that a {CMDx::Chain}'s root is a {CMDx::Result} for
-# the given task class. Accepts either a Chain or a Result.
-#
-# @example
-#   expect(result).to have_chain_root(MyWorkflow)
-RSpec::Matchers.define :have_chain_root do |task_class|
-  description { "have chain root #{task_class}" }
+module CMDx # :nodoc:
+  module RSpec
+    module Matchers
+      # Asserts the root {CMDx::Result} on a chain belongs to +task_class+ (subclass match).
+      #
+      # Accepts a {CMDx::Chain} or any {CMDx::Result} (uses `result.chain`).
+      #
+      # @see CMDx::RSpec::Matchers#have_chain_root
+      #
+      class HaveChainRoot
 
-  failure_message do |actual|
-    chain = extract_chain(actual)
-    "expected chain root to be #{task_class}, but was #{chain&.root&.task.inspect}"
-  end
+        # @param task_class [Class] expected root task class
+        def initialize(task_class)
+          @task_class = task_class
+        end
 
-  match do |actual|
-    chain = extract_chain(actual)
-    next false if chain.nil?
-    next false if chain.root.nil?
+        # @return [String]
+        def description
+          "have chain root #{@task_class}"
+        end
 
-    chain.root.task <= task_class
-  end
+        # @param actual [CMDx::Chain, CMDx::Result] chain or result exposing a chain
+        # @return [Boolean]
+        def matches?(actual)
+          @actual = actual
+          chain = extract_chain(actual)
+          return false if chain.nil?
+          return false if chain.root.nil?
 
-  define_method(:extract_chain) do |actual|
-    case actual
-    when CMDx::Chain  then actual
-    when CMDx::Result then actual.chain
+          chain.root.task <= @task_class
+        end
+
+        # @return [String]
+        def failure_message
+          chain = extract_chain(@actual)
+          "expected chain root to be #{@task_class}, but was #{chain&.root&.task.inspect}"
+        end
+
+        private
+
+        def extract_chain(actual)
+          case actual
+          when CMDx::Chain  then actual
+          when CMDx::Result then actual.chain
+          end
+        end
+
+      end
     end
   end
 end

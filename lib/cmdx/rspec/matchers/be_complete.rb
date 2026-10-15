@@ -1,20 +1,40 @@
 # frozen_string_literal: true
 
-# Matcher to verify that a result completed without interruption.
-#
-# @example
-#   expect(MyCommand.execute).to be_complete
-RSpec::Matchers.define :be_complete do
-  description { "have completed" }
+module CMDx # :nodoc:
+  module RSpec
+    module Matchers
+      # Asserts `result.state` is {CMDx::Signal::COMPLETE} (success finished normally).
+      #
+      # @see CMDx::RSpec::Matchers#be_complete
+      #
+      class BeComplete
 
-  failure_message do |result|
-    "expected #{result.inspect} to have state #{CMDx::Signal::COMPLETE.inspect}, " \
-      "but was #{result.state.inspect}"
-  end
+        INSTANCE = new
 
-  match do |result|
-    raise ArgumentError, "must be a CMDx::Result" unless result.is_a?(CMDx::Result)
+        # @return [String]
+        def description
+          "have completed"
+        end
 
-    result.state == CMDx::Signal::COMPLETE
+        # Coerces deferred fixtures and compares `state` to {CMDx::Signal::COMPLETE}.
+        #
+        # @param result [CMDx::Result] result under test
+        # @return [Boolean]
+        # @raise [ArgumentError] when +result+ is not a {CMDx::Result}
+        def matches?(result)
+          @actual = result
+          result = CMDx::RSpec::Support::ResultCoercion.materialize!(result)
+
+          result.state == CMDx::Signal::COMPLETE
+        end
+
+        # @return [String]
+        def failure_message
+          "expected #{@actual.inspect} to have state #{CMDx::Signal::COMPLETE.inspect}, " \
+            "but was #{@actual.state.inspect}"
+        end
+
+      end
+    end
   end
 end

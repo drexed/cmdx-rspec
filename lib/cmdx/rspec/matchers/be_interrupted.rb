@@ -1,20 +1,40 @@
 # frozen_string_literal: true
 
-# Matcher to verify that a result was interrupted (skipped or failed).
-#
-# @example
-#   expect(MyCommand.execute).to be_interrupted
-RSpec::Matchers.define :be_interrupted do
-  description { "have been interrupted" }
+module CMDx # :nodoc:
+  module RSpec
+    module Matchers
+      # Asserts `result.state` is {CMDx::Signal::INTERRUPTED} (skipped or failed).
+      #
+      # @see CMDx::RSpec::Matchers#be_interrupted
+      #
+      class BeInterrupted
 
-  failure_message do |result|
-    "expected #{result.inspect} to have state #{CMDx::Signal::INTERRUPTED.inspect}, " \
-      "but was #{result.state.inspect}"
-  end
+        INSTANCE = new
 
-  match do |result|
-    raise ArgumentError, "must be a CMDx::Result" unless result.is_a?(CMDx::Result)
+        # @return [String]
+        def description
+          "have been interrupted"
+        end
 
-    result.state == CMDx::Signal::INTERRUPTED
+        # Coerces deferred fixtures and compares `state` to {CMDx::Signal::INTERRUPTED}.
+        #
+        # @param result [CMDx::Result] result under test
+        # @return [Boolean]
+        # @raise [ArgumentError] when +result+ is not a {CMDx::Result}
+        def matches?(result)
+          @actual = result
+          result = CMDx::RSpec::Support::ResultCoercion.materialize!(result)
+
+          result.state == CMDx::Signal::INTERRUPTED
+        end
+
+        # @return [String]
+        def failure_message
+          "expected #{@actual.inspect} to have state #{CMDx::Signal::INTERRUPTED.inspect}, " \
+            "but was #{@actual.state.inspect}"
+        end
+
+      end
+    end
   end
 end

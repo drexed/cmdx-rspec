@@ -29,4 +29,8 @@ RSpec.describe "have_pipeline_tasks matcher" do
   it "rejects non-Workflow input" do
     expect { expect(t1).to have_pipeline_tasks(t1) }.to raise_error(ArgumentError, "must be a CMDx::Workflow")
   end
+
+  it "describes" do
+    expect(have_pipeline_tasks(t1, t2).description).to eq("have pipeline tasks [#{t1}, #{t2}]")
+  end
 end

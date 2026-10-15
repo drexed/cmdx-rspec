@@ -17,4 +17,8 @@ RSpec.describe "have_chain_size matcher" do
     result = create_successful_task.execute(CMDx::Context.new)
     expect(result).not_to have_chain_size(99)
   end
+
+  it "describes" do
+    expect(have_chain_size(3).description).to eq("have chain size 3")
+  end
 end

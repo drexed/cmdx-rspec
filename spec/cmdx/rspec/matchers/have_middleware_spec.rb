@@ -33,4 +33,8 @@ RSpec.describe "have_middleware matcher" do
     end
     expect(task_class).not_to have_middleware(other)
   end
+
+  it "describes" do
+    expect(have_middleware(middleware_class).description).to eq("have middleware #{middleware_class.inspect}")
+  end
 end

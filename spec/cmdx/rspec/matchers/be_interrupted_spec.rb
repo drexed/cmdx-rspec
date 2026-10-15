@@ -17,6 +17,17 @@ RSpec.describe "be_interrupted matcher" do
 
   it "raises on non-Result input" do
     invalid_input = :nope
+
     expect { expect(invalid_input).to be_interrupted }.to raise_error(ArgumentError, "must be a CMDx::Result")
+  end
+
+  it "accepts a deferred result fixture" do
+    deferred = CMDx::RSpec::Result.for.and_skip(reason: "nope")
+
+    expect(deferred).to be_interrupted
+  end
+
+  it "describes" do
+    expect(be_interrupted.description).to eq("have been interrupted")
   end
 end

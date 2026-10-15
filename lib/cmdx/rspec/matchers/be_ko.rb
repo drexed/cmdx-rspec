@@ -1,19 +1,39 @@
 # frozen_string_literal: true
 
-# Matcher to verify that a result is "ko" (skipped or failed), via {CMDx::Result#ko?}.
-#
-# @example
-#   expect(MyCommand.execute).to be_ko
-RSpec::Matchers.define :be_ko do
-  description { "have been ko" }
+module CMDx # :nodoc:
+  module RSpec
+    module Matchers
+      # Asserts `result.ko?` — skipped or failed, not success (delegates to the signal).
+      #
+      # @see CMDx::RSpec::Matchers#be_ko
+      #
+      class BeKo
 
-  failure_message do |result|
-    "expected #{result.inspect} to be ko (skipped or failed), but status was #{result.status.inspect}"
-  end
+        INSTANCE = new
 
-  match do |result|
-    raise ArgumentError, "must be a CMDx::Result" unless result.is_a?(CMDx::Result)
+        # @return [String]
+        def description
+          "have been ko"
+        end
 
-    result.ko?
+        # Coerces deferred fixtures and checks `status` is failed.
+        #
+        # @param result [CMDx::Result] result under test
+        # @return [Boolean]
+        # @raise [ArgumentError] when +result+ is not a {CMDx::Result}
+        def matches?(result)
+          @actual = result
+          result = CMDx::RSpec::Support::ResultCoercion.materialize!(result)
+
+          result.ko?
+        end
+
+        # @return [String]
+        def failure_message
+          "expected #{@actual.inspect} to be ko (skipped or failed), but status was #{@actual.status.inspect}"
+        end
+
+      end
+    end
   end
 end

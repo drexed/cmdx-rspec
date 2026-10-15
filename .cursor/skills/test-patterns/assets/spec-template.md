@@ -84,7 +84,7 @@ RSpec.describe "Feature name", type: :feature do
       let(:task) { create_failing_task(reason: "something broke") }
 
       it "raises fault" do
-        expect { result }.to raise_cmdx_fault.with_reason("something broke")
+        expect { result }.to raise_fault.with_reason("something broke")
       end
     end
   end
@@ -119,7 +119,7 @@ RSpec.describe "Workflow feature name", type: :feature do
       let(:workflow) { create_failing_workflow }
 
       it "raises fault" do
-        expect { result }.to raise_cmdx_fault
+        expect { result }.to raise_fault
       end
     end
   end

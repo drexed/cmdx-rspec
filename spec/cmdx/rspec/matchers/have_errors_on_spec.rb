@@ -37,4 +37,10 @@ RSpec.describe "have_errors_on matcher" do
     task.send(:work)
     expect(task).to have_errors_on(:email)
   end
+
+  it "describes" do
+    expect(have_errors_on(:email).description).to eq("have errors on :email")
+    expect(have_errors_on(:email, "is required").description)
+      .to eq('have errors on :email matching ["is required"]')
+  end
 end

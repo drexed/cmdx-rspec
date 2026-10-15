@@ -3,57 +3,43 @@
 require "spec_helper"
 
 RSpec.describe "have_failed matcher" do
-  describe "basic failure checking" do
-    context "when result is a failure" do
-      it "passes" do
-        task_class = create_failing_task(name: "TestTask")
-        result = task_class.execute(CMDx::Context.new)
+  let(:result) { create_failing_task.execute(CMDx::Context.new) }
 
-        expect(result).to have_failed
-      end
-    end
+  it "passes for a failed result" do
+    expect(result).to have_failed
   end
 
-  describe "failure attributes validation" do
-    context "with default failure result" do
-      let(:task_class) { create_failing_task(name: "TestTask") }
-      let(:result) { task_class.execute(CMDx::Context.new) }
-
-      it "validates all required failure attributes" do
-        expect(result).to have_failed
-      end
-
-      it "validates state is INTERRUPTED" do
-        expect(result).to have_failed(state: CMDx::Signal::INTERRUPTED)
-      end
-
-      it "validates status is FAILED" do
-        expect(result).to have_failed(status: CMDx::Signal::FAILED)
-      end
-    end
+  it "validates state is INTERRUPTED" do
+    expect(result).to have_failed(state: CMDx::Signal::INTERRUPTED)
   end
 
-  describe "edge cases" do
-    context "with non-CMDx::Result input" do
-      it "raises ArgumentError for string" do
-        not_a_result = "not a result"
-        expect { expect(not_a_result).to have_failed }.to raise_error(ArgumentError, "must be a CMDx::Result")
-      end
-
-      it "raises ArgumentError for nil" do
-        not_a_result = nil
-        expect { expect(not_a_result).to have_failed }.to raise_error(ArgumentError, "must be a CMDx::Result")
-      end
-
-      it "raises ArgumentError for arbitrary object" do
-        expect { expect(Object.new).to have_failed }.to raise_error(ArgumentError, "must be a CMDx::Result")
-      end
-    end
+  it "validates status is FAILED" do
+    expect(result).to have_failed(status: CMDx::Signal::FAILED)
   end
 
-  describe "matcher description" do
-    it "provides clear description" do
-      expect(have_failed.description).to eq("have been a failure")
-    end
+  it "accepts composable matchers in keyword args" do
+    expect(create_failing_task(reason: "nope").execute(CMDx::Context.new)).to have_failed(reason: be_a(String))
+  end
+
+  it "fails for a successful result" do
+    ok = create_successful_task.execute(CMDx::Context.new)
+
+    expect { expect(ok).to have_failed }.to raise_error(RSpec::Expectations::ExpectationNotMetError)
+  end
+
+  it "accepts a deferred result fixture" do
+    deferred = CMDx::RSpec::Result.for.and_fail(reason: "nope")
+
+    expect(deferred).to have_failed(reason: "nope")
+  end
+
+  it "raises on non-Result input" do
+    invalid_input = :nope
+
+    expect { expect(invalid_input).to have_failed }.to raise_error(ArgumentError, "must be a CMDx::Result")
+  end
+
+  it "describes" do
+    expect(have_failed.description).to eq("have been a failure")
   end
 end

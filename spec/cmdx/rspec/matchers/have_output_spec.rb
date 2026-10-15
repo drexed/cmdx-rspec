@@ -26,4 +26,8 @@ RSpec.describe "have_output matcher" do
   it "matches required: false" do
     expect(task_class).to have_output(:note, required: false)
   end
+
+  it "describes" do
+    expect(have_output(:total).description).to eq("have output :total")
+  end
 end

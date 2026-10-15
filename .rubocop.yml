@@ -23,6 +23,8 @@ Metrics/AbcSize:
   Enabled: false
 Metrics/BlockLength:
   Enabled: false
+Metrics/ClassLength:
+  Enabled: false
 Metrics/CyclomaticComplexity:
   Enabled: false
 Metrics/MethodLength:
@@ -30,6 +32,8 @@ Metrics/MethodLength:
 Metrics/ModuleLength:
   Enabled: false
 Metrics/PerceivedComplexity:
+  Enabled: false
+Naming/PredicatePrefix:
   Enabled: false
 RSpec/DescribeClass:
   Enabled: false
@@ -45,11 +49,6 @@ RSpec/MultipleMemoizedHelpers:
   Enabled: false
 RSpec/NestedGroups:
   Enabled: false
-RSpec/NoExpectationExample:
-  AllowedPatterns:
-    - "^expect_"
-    - "^expected_"
-    - "^assert_"
 RSpec/SpecFilePathFormat:
   CustomTransform:
     CMDx: cmdx

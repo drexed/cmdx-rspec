@@ -19,6 +19,14 @@ RSpec.describe "have_empty_context matcher" do
       end
     end
 
+    context "when context is a deferred result fixture with empty context" do
+      it "passes" do
+        deferred = CMDx::RSpec::Result.for.and_succeed
+
+        expect(deferred).to have_empty_context
+      end
+    end
+
     context "when context is a CMDx::Result with empty context" do
       it "passes" do
         # Create a task that doesn't modify the context
@@ -85,9 +93,7 @@ RSpec.describe "have_empty_context matcher" do
     end
   end
 
-  describe "matcher description" do
-    it "provides clear description" do
-      expect(have_empty_context.description).to eq("have an empty context")
-    end
+  it "describes" do
+    expect(have_empty_context.description).to eq("have an empty context")
   end
 end

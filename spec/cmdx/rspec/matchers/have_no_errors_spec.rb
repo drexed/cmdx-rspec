@@ -13,4 +13,8 @@ RSpec.describe "have_no_errors matcher" do
     end
     expect(task_class.execute(CMDx::Context.new)).not_to have_no_errors
   end
+
+  it "describes" do
+    expect(have_no_errors.description).to eq("have no errors")
+  end
 end

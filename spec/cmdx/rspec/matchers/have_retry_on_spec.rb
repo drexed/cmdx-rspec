@@ -28,4 +28,10 @@ RSpec.describe "have_retry_on matcher" do
   it "fails when option mismatches" do
     expect(task_class).not_to have_retry_on(CMDx::TestError, limit: 99)
   end
+
+  it "describes" do
+    expect(have_retry_on(CMDx::TestError).description).to eq("have retry on CMDx::TestError")
+    expect(have_retry_on(CMDx::TestError, limit: 5).description)
+      .to eq("have retry on CMDx::TestError matching {limit: 5}")
+  end
 end

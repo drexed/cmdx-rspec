@@ -31,4 +31,24 @@ RSpec.describe "have_been_retried matcher" do
   it "fails for a result that wasn't retried" do
     expect(create_successful_task.execute(CMDx::Context.new)).not_to have_been_retried
   end
+
+  it "accepts a deferred result fixture" do
+    deferred = CMDx::RSpec::Result.for.and_succeed.with_retries(2)
+
+    expect(deferred).to have_been_retried(2)
+  end
+
+  it "raises ArgumentError for non-result input" do
+    not_a_result = :nope
+
+    expect { expect(not_a_result).to have_been_retried }.to raise_error(ArgumentError, "must be a CMDx::Result")
+  end
+
+  it "describes count expectations in failure messages" do
+    deferred = CMDx::RSpec::Result.for.and_succeed.with_retries(1)
+    matcher = have_been_retried(3)
+
+    expect(matcher.matches?(deferred)).to be(false)
+    expect(matcher.failure_message).to include("3 times").and include("1")
+  end
 end

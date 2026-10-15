@@ -1,30 +1,48 @@
 # frozen_string_literal: true
 
-# Matcher to verify that a {CMDx::Result}, task instance, or {CMDx::Errors}
-# is free of errors.
-#
-# @example
-#   expect(result).to have_no_errors
-RSpec::Matchers.define :have_no_errors do
-  description { "have no errors" }
+module CMDx # :nodoc:
+  module RSpec
+    module Matchers
+      # Asserts the subject's errors collection is empty.
+      #
+      # @see CMDx::RSpec::Matchers#have_no_errors
+      #
+      class HaveNoErrors
 
-  failure_message do |actual|
-    errors = extract_errors(actual)
-    "expected #{actual.inspect} to have no errors, but had #{errors&.to_h.inspect}"
-  end
+        INSTANCE = new
 
-  match do |actual|
-    errors = extract_errors(actual)
-    next false if errors.nil?
+        # @return [String]
+        def description
+          "have no errors"
+        end
 
-    errors.empty?
-  end
+        # @param actual [Object] value under test
+        # @return [Boolean]
+        def matches?(actual)
+          @actual = actual
+          errors = extract_errors(actual)
+          return false if errors.nil?
 
-  define_method(:extract_errors) do |actual|
-    case actual
-    when CMDx::Errors then actual
-    when CMDx::Result, CMDx::Task then actual.errors
-    else actual.respond_to?(:errors) ? actual.errors : nil
+          errors.empty?
+        end
+
+        # @return [String]
+        def failure_message
+          errors = extract_errors(@actual)
+          "expected #{@actual.inspect} to have no errors, but had #{errors&.to_h.inspect}"
+        end
+
+        private
+
+        def extract_errors(actual)
+          case actual
+          when CMDx::Errors then actual
+          when CMDx::Result, CMDx::Task then actual.errors
+          else actual.respond_to?(:errors) ? actual.errors : nil
+          end
+        end
+
+      end
     end
   end
 end

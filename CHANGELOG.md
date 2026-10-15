@@ -6,6 +6,36 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ## [Unreleased]
 
+## [3.0.0] - Unreleased
+
+### Added
+- `build_result` factory — fluent `CMDx::RSpec::Result` with the same outcome chains as `execute` (`and_succeed`, `and_skip`, `and_fail`, `and_throw`, `with_error`, `and_output`, `as_deprecated`) for constructing real `CMDx::Result` fixtures without stubbing execution
+- `have_logs` matcher — expect CMDx logger output from a block (`including`, `matching`, `on_lines`, count chains, composable matchers)
+- `emit_telemetry` matcher — expect telemetry events from a block (`.on(Task)`, `with_names`, `with_payload`, count chains)
+- `execute` and `execute!` matchers — stub or expect task execution. Keyword arguments constrain the call and seed the result context. Outcome chains: `and_succeed`, `and_skip`, `and_fail`, `and_throw`, `and_output`, `with_error`, `as_deprecated`
+- `execute_pipeline` and `execute_pipeline!` matchers — stub or expect every pipeline task on a Workflow (instance `#execute` by default; `.on_class` for `Task.execute`)
+- `have_executed` and `have_executed!` matchers — assert `execute` / `execute!` after the action, in the style of `have_received`
+
+### Changed
+- Performance — reuse frozen `be_empty` and outcome `include` matchers on hot paths; `have_matching_context` with no keys delegates to `have_empty_context` (including deferred fixtures)
+- `execute` / `execute!` — support `and_wrap_original` (and other implementation chains with a trailing block on `allow(...).to` / `expect(...).to`), matching RSpec's `receive` matcher
+- `execute` / `execute!` — `allow_any_instance_of` and `expect_any_instance_of` stub or expect `Task#execute` on workflow subtask instances (`execute!` maps to `#execute`); call-signature keywords apply to class `.execute` only, not instance `#execute`
+- `have_executed` / `have_executed!` — `expect_any_instance_of` asserts instance `#execute` (`have_executed!` expects `strict: true`)
+- YARD — standardized `lib/` documentation (intent-first summaries, complete `@param` descriptions, tag order, `@see` links to factories); `:nodoc` on `CMDx` reopenings
+- All RSpec matchers are class-based under `CMDx::RSpec::Matchers` (same pattern as `Execute` / `HaveExecuted`). Factory methods on `CMDx::RSpec::Matchers` replace `RSpec::Matchers.define`
+- `CMDx::RSpec::Matchers::Execute` and `CMDx::RSpec::Result` share `Support::OutcomeChains` and `Support::ResultFactory`
+- README — document execution matchers in place of the stub and mock helpers
+
+### Removed
+- `CMDx::RSpec::Helpers` and `build_successful_result`, `build_skipped_result`, `build_failed_result`, and `build_echoed_result` — use `build_result(...).and_succeed` (and the other outcome chains) from `CMDx::RSpec::Matchers`
+- `with_cmdx_chain` — use `result.chain` from a returned `CMDx::Result`, or `emit_telemetry(:task_executed).on(Task)` when execution is indirect
+- `capture_cmdx_logs` and `subscribe_telemetry` helpers — use `have_logs` and `emit_telemetry` matchers
+- `stub_workflow_tasks` — use `allow(MyWorkflow).to execute_pipeline` / `execute_pipeline!` with an outcome chain or per-task block
+- `stub_task`, `stub_task!`, `stub_task_success`, `stub_task_success!`, `stub_task_skip`, `stub_task_skip!`, `stub_task_fail`, `stub_task_fail!`, `stub_task_error`, `stub_task_throw`, and `stub_task_deprecated` — use `allow(Task).to execute` / `execute!` with an outcome chain
+- `unstub_task` and `unstub_task!` — use `allow(Task).to execute.and_call_original`
+- `expect_task_execution`, `expect_task_execution!`, `expect_no_task_execution`, and `expect_no_task_execution!` — use `expect(Task).to execute` / `expect(Task).not_to execute`
+- `expected_task_execution`, `expected_task_execution!`, `expected_no_task_execution`, and `expected_no_task_execution!` — use `expect(Task).to have_executed` / `expect(Task).not_to have_executed`
+
 ## [2.1.0] - 2026-10-14
 
 ### Added

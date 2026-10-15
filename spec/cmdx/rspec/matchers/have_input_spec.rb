@@ -37,4 +37,10 @@ RSpec.describe "have_input matcher" do
   it "accepts an instance and reads the class" do
     expect(task_class.new(CMDx::Context.new)).to have_input(:user_id)
   end
+
+  it "describes" do
+    expect(have_input(:user_id).description).to eq("have input :user_id")
+    expect(have_input(:user_id, required: true).description)
+      .to eq("have input :user_id matching {required: true}")
+  end
 end

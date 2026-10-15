@@ -1,30 +1,56 @@
 # frozen_string_literal: true
 
-# Matcher to verify a {CMDx::Result}'s duration (in milliseconds) falls
-# within an upper bound, lower bound, or both.
-#
-# @example
-#   expect(result).to have_duration(less_than: 100)
-#   expect(result).to have_duration(greater_than: 0.1)
-#   expect(result).to have_duration(greater_than: 1, less_than: 50)
-RSpec::Matchers.define :have_duration do |less_than: nil, greater_than: nil|
-  description do
-    parts = []
-    parts << "greater than #{greater_than}ms" if greater_than
-    parts << "less than #{less_than}ms" if less_than
-    "have duration #{parts.join(' and ')}"
-  end
+module CMDx # :nodoc:
+  module RSpec
+    module Matchers
+      # Asserts `result.duration` (milliseconds) satisfies exclusive bounds.
+      #
+      # At least one of `:less_than` or `:greater_than` is required.
+      #
+      # @see CMDx::RSpec::Matchers#have_duration
+      #
+      class HaveDuration
 
-  failure_message do |result|
-    "expected duration to satisfy bounds (less_than: #{less_than}, greater_than: #{greater_than}), but was #{result.duration}"
-  end
+        # Records exclusive duration bounds (at least one is required when matching).
+        #
+        # @param less_than [Numeric, nil] exclusive upper bound in milliseconds
+        # @param greater_than [Numeric, nil] exclusive lower bound in milliseconds
+        # @return [void]
+        def initialize(less_than: nil, greater_than: nil)
+          @less_than = less_than
+          @greater_than = greater_than
+        end
 
-  match do |result|
-    raise ArgumentError, "must be a CMDx::Result" unless result.is_a?(CMDx::Result)
-    raise ArgumentError, "provide :less_than and/or :greater_than" if less_than.nil? && greater_than.nil?
-    next false if result.duration.nil?
+        # @return [String]
+        def description
+          parts = []
+          parts << "greater than #{@greater_than}ms" if @greater_than
+          parts << "less than #{@less_than}ms" if @less_than
+          "have duration #{parts.join(' and ')}"
+        end
 
-    (less_than.nil? || result.duration < less_than) &&
-      (greater_than.nil? || result.duration > greater_than)
+        # Coerces deferred fixtures and checks `duration` against the configured bounds.
+        #
+        # @param result [CMDx::Result] result under test
+        # @return [Boolean]
+        # @raise [ArgumentError] when +result+ is not a {CMDx::Result} or bounds are missing
+        def matches?(result)
+          @actual = result
+          result = CMDx::RSpec::Support::ResultCoercion.materialize!(result)
+          raise ArgumentError, "provide :less_than and/or :greater_than" if @less_than.nil? && @greater_than.nil?
+          return false if result.duration.nil?
+
+          (@less_than.nil? || result.duration < @less_than) &&
+            (@greater_than.nil? || result.duration > @greater_than)
+        end
+
+        # @return [String]
+        def failure_message
+          "expected duration to satisfy bounds (less_than: #{@less_than}, greater_than: #{@greater_than}), " \
+            "but was #{@actual.duration}"
+        end
+
+      end
+    end
   end
 end

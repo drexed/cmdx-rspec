@@ -33,4 +33,8 @@ RSpec.describe "have_callback matcher" do
   it "fails when callable mismatches" do
     expect(task_class).not_to have_callback(:before_execution, :other_method)
   end
+
+  it "describes" do
+    expect(have_callback(:before_execution).description).to eq("have callback for :before_execution")
+  end
 end

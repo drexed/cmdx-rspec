@@ -1,27 +1,55 @@
 # frozen_string_literal: true
 
-# Matcher to verify that a {CMDx::Workflow} class declares the given
-# pipeline tasks. Compares the flattened, deduplicated pipeline against
-# the expected task classes (order-sensitive).
-#
-# @example
-#   expect(MyWorkflow).to have_pipeline_tasks(StepA, StepB, StepC)
-#
-# @example Order-insensitive variant
-#   expect(MyWorkflow).to have_pipeline_tasks(StepA, StepC, StepB).in_any_order
-RSpec::Matchers.define :have_pipeline_tasks do |*expected|
-  description { "have pipeline tasks #{expected.inspect}" }
+module CMDx # :nodoc:
+  module RSpec
+    module Matchers
+      # Asserts a {CMDx::Workflow}'s flattened pipeline task list matches expectations.
+      #
+      # @see CMDx::RSpec::Matchers#have_pipeline_tasks
+      #
+      class HavePipelineTasks
 
-  failure_message do |actual|
-    "expected #{actual} pipeline to be #{expected.inspect}, but was #{actual.pipeline.flat_map(&:tasks).uniq.inspect}"
+        # @param expected [Array<Class>] expected task classes in pipeline order
+        def initialize(expected)
+          @expected = expected
+          @any_order = false
+        end
+
+        # @return [String]
+        def description
+          "have pipeline tasks #{@expected.inspect}"
+        end
+
+        # @param actual [Class] workflow class under test
+        # @return [Boolean]
+        # @raise [ArgumentError] when +actual+ is not a Workflow class
+        def matches?(actual)
+          @actual = actual
+          raise ArgumentError, "must be a CMDx::Workflow" unless actual.is_a?(Class) && actual.include?(CMDx::Workflow)
+
+          tasks = Support::PipelineTasks.list(actual)
+          if @any_order
+            tasks.sort_by(&:object_id) == @expected.sort_by(&:object_id)
+          else
+            tasks == @expected
+          end
+        end
+
+        # @return [String]
+        def failure_message
+          "expected #{@actual} pipeline to be #{@expected.inspect}, " \
+            "but was #{Support::PipelineTasks.list(@actual).inspect}"
+        end
+
+        # Compares task classes without enforcing pipeline order.
+        #
+        # @return [HavePipelineTasks] self
+        def in_any_order
+          @any_order = true
+          self
+        end
+
+      end
+    end
   end
-
-  match do |actual|
-    raise ArgumentError, "must be a CMDx::Workflow" unless actual.is_a?(Class) && actual.include?(CMDx::Workflow)
-
-    tasks = actual.pipeline.flat_map(&:tasks).uniq
-    @any_order ? tasks.sort_by(&:object_id) == expected.sort_by(&:object_id) : tasks == expected
-  end
-
-  chain(:in_any_order) { @any_order = true }
 end

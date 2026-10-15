@@ -1,21 +1,51 @@
 # frozen_string_literal: true
 
-# Asserts a {CMDx::Result} was skipped (`state: interrupted`,
-# `status: skipped`). Extra keyword args constrain other `result.to_h`
-# fields such as `:reason`, `:cause`, or `:metadata`.
-#
-# @example
-#   expect(result).to have_skipped(reason: "out of stock")
-RSpec::Matchers.define :have_skipped do |**data|
-  description { "have been skipped" }
+module CMDx # :nodoc:
+  module RSpec
+    module Matchers
+      # Asserts `state` / `status` on `result.to_h` match skip, plus optional fields.
+      #
+      # Extra keyword args use RSpec's `include` matcher (nested matchers allowed).
+      #
+      # @see CMDx::RSpec::Matchers#have_skipped
+      #
+      class HaveSkipped
 
-  match(notify_expectation_failures: true) do |result|
-    raise ArgumentError, "must be a CMDx::Result" unless result.is_a?(CMDx::Result)
+        include DelegatesExpectations
 
-    expect(result.to_h).to include(
-      state: CMDx::Signal::INTERRUPTED,
-      status: CMDx::Signal::SKIPPED,
-      **data
-    )
+        # @param data [Hash{Symbol => Object}] extra `result.to_h` fields to `include`
+        def initialize(data)
+          @data = data
+        end
+
+        INSTANCE = new(EMPTY_HASH).freeze
+
+        BASE_INCLUDE = ::RSpec::Matchers::BuiltIn::Include.new(
+          state: CMDx::Signal::INTERRUPTED,
+          status: CMDx::Signal::SKIPPED
+        )
+        private_constant :BASE_INCLUDE
+
+        # @return [String]
+        def description
+          "have been skipped"
+        end
+
+        # Materializes deferred fixtures and delegates to RSpec's `include` matcher on `to_h`.
+        #
+        # @param result [CMDx::Result] result under test
+        # @return [Boolean]
+        # @raise [ArgumentError] when +result+ is not a {CMDx::Result}
+        # @raise [RSpec::Expectations::ExpectationNotMetError] when attributes do not match
+        def matches?(result)
+          result = CMDx::RSpec::Support::ResultCoercion.materialize!(result)
+
+          matcher = @data.empty? ? BASE_INCLUDE : built_in_include(state: CMDx::Signal::INTERRUPTED, status: CMDx::Signal::SKIPPED, **@data)
+          assert_expectation!(result.to_h, matcher)
+          true
+        end
+
+      end
+    end
   end
 end

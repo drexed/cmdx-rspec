@@ -3,6 +3,35 @@
 require "spec_helper"
 
 RSpec.describe "have_matching_context matcher" do
+  describe "empty expectation" do
+    context "when no keys are expected" do
+      it "delegates to have_empty_context for a Hash" do
+        context = {}
+
+        expect(context).to have_matching_context
+      end
+
+      it "delegates to have_empty_context for an empty CMDx::Context" do
+        expect(CMDx::Context.new).to have_matching_context
+      end
+
+      it "delegates to have_empty_context for a result with empty context" do
+        task_class = create_task_class(name: "TestTask") do
+          define_method(:work) { :success }
+        end
+        result = task_class.execute(CMDx::Context.new)
+
+        expect(result).to have_matching_context
+      end
+
+      it "fails when the Hash is not empty" do
+        context = { user_id: 1 }
+
+        expect { expect(context).to have_matching_context }.to raise_error(RSpec::Expectations::ExpectationNotMetError)
+      end
+    end
+  end
+
   describe "basic context matching" do
     context "when context is a Hash" do
       it "passes for exact match" do
@@ -53,6 +82,20 @@ RSpec.describe "have_matching_context matcher" do
         context[:user_id] = 123
 
         expect { expect(context).to have_matching_context(user_id: 123, role: "admin") }.to raise_error(RSpec::Expectations::ExpectationNotMetError)
+      end
+    end
+
+    context "when context is a deferred result fixture" do
+      it "passes for matching context data" do
+        deferred = CMDx::RSpec::Result.for(user_id: 123, role: "admin").and_succeed
+
+        expect(deferred).to have_matching_context(user_id: 123, role: "admin")
+      end
+
+      it "delegates to have_empty_context when no keys are expected" do
+        deferred = CMDx::RSpec::Result.for.and_succeed
+
+        expect(deferred).to have_matching_context
       end
     end
 
@@ -184,17 +227,29 @@ RSpec.describe "have_matching_context matcher" do
     end
   end
 
+  describe "nested matchers" do
+    it "accepts composable matchers in keyword args" do
+      context = { user_id: 123 }
+
+      expect(context).to have_matching_context(user_id: be_a(Integer))
+    end
+  end
+
   describe "error handling" do
     context "with unsupported input types" do
+      it "raises error for nil with expected keys" do
+        invalid_input = nil
+
+        expect { expect(invalid_input).to have_matching_context(key: "value") }.to raise_error("unknown context type NilClass")
+      end
+
       it "raises error for arbitrary object" do
         expect { expect(Object.new).to have_matching_context(key: "value") }.to raise_error(/unknown context type Object/)
       end
     end
   end
 
-  describe "matcher description" do
-    it "provides clear description" do
-      expect(have_matching_context.description).to eq("have matching context")
-    end
+  it "describes" do
+    expect(have_matching_context.description).to eq("have matching context")
   end
 end
